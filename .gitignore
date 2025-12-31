@@ -80,6 +80,7 @@ Desktop.ini
 # Docker
 .docker/
 docker-compose.override.yml
+docker-compose.local.yml
 
 # Testing
 .pytest_cache/

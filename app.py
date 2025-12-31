@@ -794,7 +794,7 @@ if __name__ == '__main__':
         else:
             print("لم يتم العثور على المستخدم abdelwahied@gmail.com")
     
-    # استخدام 0.0.0.0 للسماح بالوصول من خارج الحاوية
-    host = '0.0.0.0' if os.getenv('FLASK_ENV') == 'production' else '127.0.0.1'
+    # استخدام 0.0.0.0 للسماح بالوصول من خارج الحاوية (مطلوب في Docker)
+    host = '0.0.0.0'
     debug = os.getenv('FLASK_ENV') != 'production'
     app.run(debug=debug, host=host, port=4000) 
