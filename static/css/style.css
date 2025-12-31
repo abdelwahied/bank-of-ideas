@@ -1,0 +1,322 @@
+:root {
+    --primary-color: #4A90E2;
+    --secondary-color: #FFB84D;
+    --accent-color: #4ECDC4;
+    --success-color: #6BCB77;
+    --warning-color: #FFD93D;
+    --background-color: #F8F9FA;
+    --text-color: #2C3E50;
+    --light-bg: #FFFFFF;
+    --border-color: #E9ECEF;
+}
+
+body {
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.7;
+}
+
+.navbar {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #5BA3F5 50%, var(--accent-color) 100%);
+    padding: 1rem 0;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+}
+
+.navbar-brand {
+    color: white !important;
+    font-weight: 700;
+    font-size: 1.5rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.nav-link {
+    color: rgba(255,255,255,0.9) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: white !important;
+    background-color: rgba(255,255,255,0.1);
+    transform: translateY(-1px);
+}
+
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    animation: fadeIn 0.5s ease-out;
+    background: var(--light-bg);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(74, 144, 226, 0.2);
+}
+
+.card-title {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    font-weight: 700;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), #5BA3F5);
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(74, 144, 226, 0.3);
+    background: linear-gradient(135deg, #5BA3F5, var(--primary-color));
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(149, 165, 166, 0.3);
+}
+
+.badge {
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
+    font-weight: 600;
+}
+
+.badge.bg-primary {
+    background: linear-gradient(135deg, var(--primary-color), #5BA3F5) !important;
+}
+
+.form-control {
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+}
+
+.alert {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-weight: 500;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    color: #155724;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+    color: #721c24;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+    color: #0c5460;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    color: #856404;
+}
+
+.footer {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #5BA3F5 50%, var(--accent-color) 100%);
+    color: white;
+    padding: 2rem 0;
+    margin-top: 4rem;
+    box-shadow: 0 -4px 12px rgba(74, 144, 226, 0.2);
+}
+
+.footer span {
+    font-weight: 500;
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-menu {
+    text-align: right;
+    direction: rtl;
+}
+
+.dropdown-item {
+    text-align: right;
+    direction: rtl;
+}
+
+/* محاذاة القائمة المنسدلة من حافة الهيدر */
+.navbar .dropdown-menu {
+    right: 0 !important;
+    left: auto !important;
+    margin-right: 0 !important;
+}
+
+/* تعديل المسافة العلوية للقائمة المنسدلة */
+.dropdown-menu[data-bs-popper] {
+    margin-top: 19px !important;
+}
+
+/* محاذاة القائمة المنسدلة للمستخدم من حافة الهيدر */
+.navbar-nav .nav-item.dropdown:last-child .dropdown-menu {
+    right: 0 !important;
+    left: auto !important;
+}
+
+/* محاذاة القائمة المنسدلة للأفكار من حافة الهيدر */
+.navbar-nav .nav-item.dropdown .dropdown-menu {
+    right: 0 !important;
+    left: auto !important;
+}
+
+/* ضمان أن القائمة تبدأ من حافة الهيدر في جميع الأحجام */
+[dir="rtl"] .navbar .dropdown-menu {
+    right: 0 !important;
+    left: auto !important;
+}
+
+.hero-section {
+    margin-top: 2rem;
+}
+
+/* محاذاة الأيقونات مع النص في RTL */
+[dir="rtl"] .bi {
+    display: inline-block;
+}
+
+/* Bootstrap Icons Support - التأكد من أن الأيقونات تظهر بشكل صحيح */
+.bi::before,
+[class^="bi-"]::before,
+[class*=" bi-"]::before {
+    display: inline-block;
+    font-family: bootstrap-icons !important;
+    font-style: normal;
+    font-weight: normal !important;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    vertical-align: -.125em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* دعم خاص لأيقونة shield-check-fill */
+.bi-shield-check-fill::before {
+    content: "\f4e6";
+}
+
+/* التأكد من أن الأيقونات تعمل في RTL */
+[dir="rtl"] .bi {
+    display: inline-block;
+}
+
+/* التأكد من أن الأيقونات تظهر في RTL */
+[dir="rtl"] .bi::before,
+[dir="rtl"] [class^="bi-"]::before,
+[dir="rtl"] [class*=" bi-"]::before {
+    display: inline-block !important;
+}
+
+.d-flex.align-items-center .bi {
+    vertical-align: middle;
+}
+
+/* تحسين محاذاة الأزرار */
+.btn .bi {
+    vertical-align: middle;
+}
+
+/* ألوان إضافية للأزرار */
+.btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+}
+
+.btn-outline-danger {
+    border-color: #e74c3c;
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+.btn-outline-danger:hover {
+    background: #e74c3c;
+    border-color: #e74c3c;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, var(--secondary-color), #FFC966);
+    border: none;
+    color: white;
+    font-weight: 600;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #FFC966, var(--secondary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 184, 77, 0.3);
+}
+
+/* تحسين الألوان للروابط */
+a {
+    color: var(--primary-color);
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #5BA3F5;
+}
+
+/* تحسين الألوان للنصوص المميزة */
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+

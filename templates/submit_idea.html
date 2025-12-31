@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}إضافة فكرة جديدة{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">إضافة فكرة جديدة</h2>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">عنوان الفكرة</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="category" class="form-label">التصنيف</label>
+                        <select class="form-select" id="category" name="category" required>
+                            <option value="">اختر التصنيف</option>
+                            <option value="تكنولوجيا">تكنولوجيا</option>
+                            <option value="تعليم">تعليم</option>
+                            <option value="صحة">صحة</option>
+                            <option value="بيئة">بيئة</option>
+                            <option value="اجتماعي">اجتماعي</option>
+                            <option value="أخرى">أخرى</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">وصف الفكرة</label>
+                        <textarea class="form-control" id="description" name="description" rows="6" required></textarea>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">نشر الفكرة</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

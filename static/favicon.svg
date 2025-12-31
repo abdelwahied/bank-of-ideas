@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2c3e50;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3498db;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="48" fill="url(#grad1)"/>
+  
+  <!-- Lightbulb body -->
+  <path d="M 50 20 C 40 20 32 28 32 38 C 32 45 35 50 40 54 L 40 65 C 40 68 42 70 45 70 L 55 70 C 58 70 60 68 60 65 L 60 54 C 65 50 68 45 68 38 C 68 28 60 20 50 20 Z" 
+        fill="#fff" opacity="0.95"/>
+  
+  <!-- Lightbulb base -->
+  <rect x="45" y="65" width="10" height="8" rx="2" fill="#fff" opacity="0.95"/>
+  <rect x="47" y="73" width="6" height="3" rx="1" fill="#fff" opacity="0.95"/>
+  
+  <!-- Filament -->
+  <path d="M 50 35 Q 48 40 50 45 Q 52 40 50 35" 
+        stroke="#2c3e50" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <path d="M 45 40 Q 50 42 55 40" 
+        stroke="#2c3e50" stroke-width="1.5" fill="none" opacity="0.6"/>
+  
+  <!-- Sparkles around -->
+  <circle cx="25" cy="25" r="2.5" fill="#fff" opacity="0.9"/>
+  <circle cx="75" cy="25" r="2.5" fill="#fff" opacity="0.9"/>
+  <circle cx="25" cy="75" r="2.5" fill="#fff" opacity="0.9"/>
+  <circle cx="75" cy="75" r="2.5" fill="#fff" opacity="0.9"/>
+</svg>

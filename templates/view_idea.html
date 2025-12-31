@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}{{ idea.title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <!-- عرض الفكرة -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h1 class="card-title mb-3">{{ idea.title }}</h1>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="badge bg-primary">{{ idea.category }}</span>
+                    <small class="text-muted">نشر في {{ idea.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                </div>
+                <div class="card-text mb-4">
+                    {{ idea.description | safe }}
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        <small class="text-muted d-flex align-items-center">
+                            <i class="bi bi-person ms-1"></i>بواسطة: {{ idea.author.username }}
+                        </small>
+                        <small class="text-muted d-flex align-items-center">
+                            <i class="bi bi-eye ms-1"></i>{{ idea.views }} مشاهدة
+                        </small>
+                    </div>
+                    <a href="{{ url_for('home') }}" class="btn btn-secondary">العودة للرئيسية</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- نموذج إضافة تعليق -->
+        {% if current_user.is_authenticated %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="card-title mb-3">إضافة تعليق</h3>
+                <form method="POST" action="{{ url_for('add_comment', idea_id=idea.id) }}">
+                    <div class="mb-3">
+                        <textarea class="form-control" name="content" rows="3" required 
+                                placeholder="اكتب تعليقك هنا..."></textarea>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center">
+                            <i class="bi bi-send ms-1"></i>إرسال التعليق
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info mb-4 d-flex align-items-center">
+            <i class="bi bi-info-circle ms-2"></i>
+            يجب <a href="{{ url_for('login') }}" class="alert-link">تسجيل الدخول</a> لإضافة تعليق
+        </div>
+        {% endif %}
+
+        <!-- عرض التعليقات -->
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title mb-3 d-flex align-items-center">
+                    <i class="bi bi-chat-dots ms-2"></i>
+                    التعليقات ({{ comments|length }})
+                </h3>
+                {% if comments %}
+                    {% for comment in comments|sort(attribute='created_at', reverse=true) %}
+                    <div class="comment mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>{{ comment.author.username }}</strong>
+                                <small class="text-muted ms-2">
+                                    {{ comment.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                    {% if comment.updated_at %}
+                                        <span class="text-muted">(معدل)</span>
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                {% if current_user.is_authenticated and current_user.id == idea.user_id %}
+                                <!-- زر نشر/إخفاء التعليق لصاحب الفكرة -->
+                                <form method="POST" action="{{ url_for('toggle_comment_publish', comment_id=comment.id) }}" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-{{ 'warning' if comment.is_published else 'secondary' }} d-inline-flex align-items-center" title="{{ 'إخفاء' if comment.is_published else 'نشر' }}">
+                                        <i class="bi bi-{{ 'eye-slash' if comment.is_published else 'eye' }} ms-1"></i>
+                                    </button>
+                                </form>
+                                {% if not comment.is_published %}
+                                <span class="badge bg-secondary">غير منشور</span>
+                                {% endif %}
+                                {% endif %}
+                                {% if current_user.is_authenticated and current_user.id == comment.user_id %}
+                                <!-- أزرار تعديل وحذف التعليق لصاحب التعليق -->
+                                <a href="{{ url_for('edit_comment', comment_id=comment.id) }}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center" title="تعديل">
+                                    <i class="bi bi-pencil ms-1"></i>
+                                </a>
+                                <form method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا التعليق؟');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center" title="حذف">
+                                        <i class="bi bi-trash ms-1"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <p class="mb-0">{{ comment.content }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        لا توجد تعليقات بعد. كن أول من يعلق!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

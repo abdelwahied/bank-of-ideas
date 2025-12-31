@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}إدارة المستخدمين{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="mb-4 d-flex align-items-center">
+            <i class="bi bi-people-fill ms-2"></i>إدارة المستخدمين
+        </h1>
+    </div>
+</div>
+
+<!-- إحصائيات سريعة -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card text-center" style="background: linear-gradient(135deg, #4A90E2, #5BA3F5); color: white;">
+            <div class="card-body">
+                <i class="bi bi-people-fill" style="font-size: 2rem;"></i>
+                <h4 class="mt-2">{{ users_data|length }}</h4>
+                <p class="mb-0">إجمالي المستخدمين</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center" style="background: linear-gradient(135deg, #FFB84D, #FFC966); color: white;">
+            <div class="card-body">
+                <i class="bi bi-shield-check-fill" style="font-size: 2rem;"></i>
+                <h4 class="mt-2">{{ users_data|selectattr('user.is_admin', 'equalto', True)|list|length }}</h4>
+                <p class="mb-0">المدراء</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center" style="background: linear-gradient(135deg, #4ECDC4, #6BCB77); color: white;">
+            <div class="card-body">
+                <i class="bi bi-person-fill" style="font-size: 2rem;"></i>
+                <h4 class="mt-2">{{ users_data|selectattr('user.is_admin', 'equalto', False)|list|length }}</h4>
+                <p class="mb-0">المستخدمون العاديون</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- جدول المستخدمين -->
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0 d-flex align-items-center">
+            <i class="bi bi-table ms-2"></i>قائمة المستخدمين
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>الصورة</th>
+                        <th>اسم المستخدم</th>
+                        <th>البريد الإلكتروني</th>
+                        <th>الاسم الكامل</th>
+                        <th>الدور</th>
+                        <th>الأفكار</th>
+                        <th>التعليقات</th>
+                        <th>الزيارات</th>
+                        <th>تاريخ التسجيل</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in users_data %}
+                    {% set user = data.user %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>
+                            {% if user.profile_picture %}
+                            <img src="{{ url_for('uploaded_file', filename=user.profile_picture) }}" 
+                                 alt="{{ user.username }}" 
+                                 class="rounded-circle" 
+                                 style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                                 style="width: 40px; height: 40px; background: linear-gradient(135deg, #4A90E2, #5BA3F5); color: white; font-weight: bold;">
+                                {{ user.username[0].upper() }}
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong>{{ user.username }}</strong>
+                            {% if user.google_id %}
+                            <span class="badge bg-info ms-1" title="مسجل عبر Google">
+                                <i class="bi bi-google"></i>
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.full_name or '-' }}</td>
+                        <td>
+                            {% if user.is_admin %}
+                            <span class="badge bg-danger d-inline-flex align-items-center">
+                                <i class="bi bi-shield-check-fill ms-1"></i>أدمن
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary d-inline-flex align-items-center">
+                                <i class="bi bi-person-fill ms-1"></i>مستخدم عادي
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-primary">{{ data.ideas_count }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-success">{{ data.comments_count }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-info">{{ data.visits_count }}</span>
+                        </td>
+                        <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('edit_user', user_id=user.id) }}" 
+                                   class="btn btn-sm btn-primary" 
+                                   title="تعديل">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                {% if user.id != current_user.id %}
+                                <form method="POST" action="{{ url_for('toggle_user_admin', user_id=user.id) }}" class="d-inline">
+                                    <button type="submit" 
+                                            class="btn btn-sm btn-{{ 'warning' if user.is_admin else 'success' }}"
+                                            title="{{ 'إلغاء صلاحية الأدمن' if user.is_admin else 'تعيين كأدمن' }}"
+                                            onclick="return confirm('هل أنت متأكد من تغيير صلاحيات {{ user.username }}؟');">
+                                        <i class="bi bi-{{ 'shield-x' if user.is_admin else 'shield-check' }}"></i>
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('delete_user', user_id=user.id) }}" class="d-inline"
+                                      onsubmit="return confirm('هل أنت متأكد من حذف المستخدم {{ user.username }}؟ سيتم حذف جميع أفكاره وتعليقاته أيضاً!');">
+                                    <button type="submit" class="btn btn-sm btn-danger" title="حذف">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="text-muted">أنت</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- الأزرار -->
+<div class="mt-4 d-flex justify-content-between">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-right ms-1"></i>العودة إلى لوحة التحكم
+    </a>
+    <a href="{{ url_for('add_user') }}" class="btn btn-success">
+        <i class="bi bi-person-plus-fill ms-1"></i>إضافة مستخدم جديد
+    </a>
+</div>
+{% endblock %}
+

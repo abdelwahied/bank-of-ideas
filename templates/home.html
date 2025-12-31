@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}الرئيسية{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section text-center mb-5 py-5" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); border-radius: 15px; color: white; padding: 4rem 2rem;">
+    <div class="container">
+        <h1 class="display-3 mb-4 d-flex align-items-center justify-content-center">
+            <i class="bi bi-lightbulb-fill ms-3"></i>مرحباً بك في بنك الأفكار
+        </h1>
+        <p class="lead mb-4" style="font-size: 1.3rem;">منصة تفاعلية لمشاركة أفكارك والتفاعل مع أفكار الآخرين</p>
+        {% if not current_user.is_authenticated %}
+        <div class="mt-4">
+            <a href="{{ url_for('register') }}" class="btn btn-light btn-lg ms-3 d-inline-flex align-items-center">
+                <i class="bi bi-person-plus-fill ms-2"></i>إنشاء حساب
+            </a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg d-inline-flex align-items-center">
+                <i class="bi bi-box-arrow-in-right ms-2"></i>تسجيل الدخول
+            </a>
+        </div>
+        {% else %}
+        <div class="mt-4">
+            <a href="{{ url_for('submit_idea') }}" class="btn btn-light btn-lg d-inline-flex align-items-center">
+                <i class="bi bi-plus-circle-fill ms-2"></i>شارك فكرتك الآن
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Links -->
+<div class="row mb-5">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 text-center border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="mb-3" style="font-size: 3rem; color: #3498db;">
+                    <i class="bi bi-eye-fill"></i>
+                </div>
+                <h3 class="card-title">الأكثر مشاهدة</h3>
+                <p class="card-text text-muted">اكتشف الأفكار الأكثر شعبية والمشاهدات</p>
+                <a href="{{ url_for('most_viewed') }}" class="btn btn-primary d-inline-flex align-items-center">
+                    <i class="bi bi-arrow-left ms-2"></i>استعرض
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 text-center border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="mb-3" style="font-size: 3rem; color: #27ae60;">
+                    <i class="bi bi-clock-fill"></i>
+                </div>
+                <h3 class="card-title">الأحدث إضافة</h3>
+                <p class="card-text text-muted">تابع آخر الأفكار التي تم إضافتها</p>
+                <a href="{{ url_for('latest_ideas') }}" class="btn btn-success d-inline-flex align-items-center">
+                    <i class="bi bi-arrow-left ms-2"></i>استعرض
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 text-center border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="mb-3" style="font-size: 3rem; color: #f39c12;">
+                    <i class="bi bi-chat-fill"></i>
+                </div>
+                <h3 class="card-title">الأكثر تعليقاً</h3>
+                <p class="card-text text-muted">شاهد الأفكار الأكثر تفاعلاً</p>
+                <a href="{{ url_for('most_commented') }}" class="btn btn-warning d-inline-flex align-items-center">
+                    <i class="bi bi-arrow-left ms-2"></i>استعرض
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <h2 class="text-center mb-5 d-flex align-items-center justify-content-center">
+            <i class="bi bi-star-fill text-warning ms-2"></i>
+            مميزات المنصة
+        </h2>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title d-flex align-items-center">
+                    <i class="bi bi-shield-check text-primary ms-2"></i>
+                    تسجيل دخول آمن
+                </h4>
+                <p class="card-text">
+                    يمكنك تسجيل الدخول بطريقتين: التسجيل التقليدي أو تسجيل الدخول السريع باستخدام حساب Google
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title d-flex align-items-center">
+                    <i class="bi bi-lightbulb text-warning ms-2"></i>
+                    مشاركة الأفكار
+                </h4>
+                <p class="card-text">
+                    شارك أفكارك مع المجتمع في مختلف التصنيفات: تكنولوجيا، تعليم، صحة، بيئة، اجتماعي، وأخرى
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title d-flex align-items-center">
+                    <i class="bi bi-chat-dots text-success ms-2"></i>
+                    نظام تعليقات تفاعلي
+                </h4>
+                <p class="card-text">
+                    تفاعل مع الأفكار من خلال إضافة تعليقاتك وآرائك البناءة
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title d-flex align-items-center">
+                    <i class="bi bi-graph-up text-info ms-2"></i>
+                    إحصائيات شاملة
+                </h4>
+                <p class="card-text">
+                    تتبع عدد المشاهدات والتعليقات لكل فكرة لمعرفة الأفكار الأكثر شعبية
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How to Use Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="text-center mb-4 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-question-circle text-primary ms-2"></i>
+                    كيف تبدأ؟
+                </h2>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="text-center">
+                            <div class="mb-3" style="font-size: 2.5rem; color: #3498db;">
+                                <i class="bi bi-person-plus-fill"></i>
+                            </div>
+                            <h5>1. إنشاء حساب</h5>
+                            <p class="text-muted">سجل حساباً جديداً أو سجل الدخول باستخدام Google</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="text-center">
+                            <div class="mb-3" style="font-size: 2.5rem; color: #27ae60;">
+                                <i class="bi bi-lightbulb-fill"></i>
+                            </div>
+                            <h5>2. شارك فكرتك</h5>
+                            <p class="text-muted">أضف فكرتك الجديدة واختر التصنيف المناسب</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="text-center">
+                            <div class="mb-3" style="font-size: 2.5rem; color: #f39c12;">
+                                <i class="bi bi-chat-left-text-fill"></i>
+                            </div>
+                            <h5>3. تفاعل</h5>
+                            <p class="text-muted">اقرأ الأفكار وشارك بتعليقاتك البناءة</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tips Section -->
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info border-0 shadow-sm">
+            <h5 class="alert-heading d-flex align-items-center">
+                <i class="bi bi-lightbulb-fill ms-2"></i>
+                نصائح للاستخدام
+            </h5>
+            <hr>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>عند إضافة فكرة:</strong></p>
+                    <ul>
+                        <li>استخدم عنواناً واضحاً ومختصراً</li>
+                        <li>اختر التصنيف المناسب</li>
+                        <li>اكتب وصفاً مفصلاً وواضحاً</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>عند التعليق:</strong></p>
+                    <ul>
+                        <li>كن محترماً ومهذباً</li>
+                        <li>قدم تعليقات بناءة</li>
+                        <li>تجنب التعليقات المسيئة</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

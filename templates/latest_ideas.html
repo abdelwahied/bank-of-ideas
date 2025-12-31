@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}الأحدث إضافة{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-5 mb-3 d-flex align-items-center">
+            <i class="bi bi-clock-fill text-success ms-2"></i>
+            الأحدث إضافة
+        </h1>
+        <p class="lead text-muted">تابع آخر الأفكار التي تم إضافتها في المنصة</p>
+    </div>
+</div>
+
+<div class="row">
+    {% for idea in ideas %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ idea.title }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">
+                    <span class="badge bg-success">{{ idea.category }}</span>
+                </h6>
+                <p class="card-text">{{ idea.description[:150] }}{% if idea.description|length > 150 %}...{% endif %}</p>
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <small class="text-muted d-flex align-items-center">
+                        <i class="bi bi-clock ms-1"></i>{{ idea.created_at.strftime('%Y-%m-%d') }}
+                    </small>
+                    <small class="text-muted d-flex align-items-center">
+                        <i class="bi bi-chat ms-1"></i>{{ idea.comments|length }} تعليق
+                    </small>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted d-flex align-items-center">
+                        <i class="bi bi-person ms-1"></i>{{ idea.author.username }}
+                    </small>
+                    <a href="{{ url_for('view_idea', idea_id=idea.id) }}" class="btn btn-success btn-sm">
+                        اقرأ المزيد
+                    </a>
+                </div>
+            </div>
+            <div class="card-footer text-muted">
+                <small class="d-flex align-items-center">
+                    <i class="bi bi-eye ms-1"></i>{{ idea.views }} مشاهدة
+                </small>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle ms-2"></i>
+            لا توجد أفكار حالياً
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+

@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+
+{% block title %}لوحة التحكم{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="mb-4 d-flex align-items-center">
+            <i class="bi bi-speedometer2 ms-2"></i>لوحة التحكم
+        </h1>
+    </div>
+</div>
+
+<!-- بطاقات الإحصائيات الرئيسية -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card text-center" style="background: linear-gradient(135deg, #4A90E2, #5BA3F5); color: white;">
+            <div class="card-body">
+                <i class="bi bi-people-fill" style="font-size: 2.5rem;"></i>
+                <h3 class="mt-2">{{ total_users }}</h3>
+                <p class="mb-0">إجمالي المستخدمين</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-center" style="background: linear-gradient(135deg, #FFB84D, #FFC966); color: white;">
+            <div class="card-body">
+                <i class="bi bi-lightbulb-fill" style="font-size: 2.5rem;"></i>
+                <h3 class="mt-2">{{ total_ideas }}</h3>
+                <p class="mb-0">إجمالي الأفكار</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-center" style="background: linear-gradient(135deg, #4ECDC4, #6BCB77); color: white;">
+            <div class="card-body">
+                <i class="bi bi-chat-dots-fill" style="font-size: 2.5rem;"></i>
+                <h3 class="mt-2">{{ total_comments }}</h3>
+                <p class="mb-0">إجمالي التعليقات</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-center" style="background: linear-gradient(135deg, #6BCB77, #4ECDC4); color: white;">
+            <div class="card-body">
+                <i class="bi bi-eye-fill" style="font-size: 2.5rem;"></i>
+                <h3 class="mt-2">{{ total_visits }}</h3>
+                <p class="mb-0">إجمالي الزيارات</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- إحصائيات الزيارات -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-day text-primary" style="font-size: 2rem;"></i>
+                <h4 class="mt-2">{{ visits_today }}</h4>
+                <p class="text-muted mb-0">زيارات اليوم</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-week text-primary" style="font-size: 2rem;"></i>
+                <h4 class="mt-2">{{ visits_this_week }}</h4>
+                <p class="text-muted mb-0">زيارات هذا الأسبوع</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-month text-primary" style="font-size: 2rem;"></i>
+                <h4 class="mt-2">{{ visits_this_month }}</h4>
+                <p class="text-muted mb-0">زيارات هذا الشهر</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- إحصائيات المتصفحات -->
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0 d-flex align-items-center">
+                    <i class="bi bi-browser-chrome ms-2"></i>المتصفحات
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if browser_stats %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>المتصفح</th>
+                                <th class="text-center">العدد</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for browser, count in browser_stats %}
+                            <tr>
+                                <td>{{ browser }}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary">{{ count }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-muted text-center">لا توجد بيانات</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- إحصائيات الأجهزة -->
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0 d-flex align-items-center">
+                    <i class="bi bi-device-hdd ms-2"></i>أنواع الأجهزة
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if device_stats %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>نوع الجهاز</th>
+                                <th class="text-center">العدد</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for device, count in device_stats %}
+                            <tr>
+                                <td>
+                                    {% if device == 'Mobile' %}
+                                        <i class="bi bi-phone-fill text-primary ms-1"></i>جوال
+                                    {% elif device == 'Tablet' %}
+                                        <i class="bi bi-tablet-fill text-primary ms-1"></i>تابلت
+                                    {% elif device == 'Desktop' %}
+                                        <i class="bi bi-pc-display text-primary ms-1"></i>كمبيوتر
+                                    {% else %}
+                                        {{ device }}
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-success">{{ count }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-muted text-center">لا توجد بيانات</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- أكثر الصفحات زيارة -->
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0 d-flex align-items-center">
+                    <i class="bi bi-star-fill ms-2"></i>أكثر الصفحات زيارة
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if popular_pages %}
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>الصفحة</th>
+                                <th class="text-center">الزيارات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for page, count in popular_pages %}
+                            <tr>
+                                <td>
+                                    <code>{{ page }}</code>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-warning text-dark">{{ count }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-muted text-center">لا توجد بيانات</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- إحصائيات إضافية -->
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0 d-flex align-items-center">
+                    <i class="bi bi-info-circle-fill ms-2"></i>معلومات إضافية
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>IPs فريدة:</strong>
+                    <span class="badge bg-info ms-2">{{ unique_ips }}</span>
+                </div>
+                <div class="mb-3">
+                    <strong>مستخدمون جدد هذا الشهر:</strong>
+                    <span class="badge bg-info ms-2">{{ new_users_month }}</span>
+                </div>
+                <div class="mb-3">
+                    <strong>أفكار جديدة هذا الشهر:</strong>
+                    <span class="badge bg-info ms-2">{{ new_ideas_month }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- آخر الزيارات -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 d-flex align-items-center">
+                    <i class="bi bi-clock-history ms-2"></i>الزيارات
+                </h5>
+                <span class="badge bg-light text-dark">
+                    إجمالي: {{ visits_pagination.total }} زيارة
+                </span>
+            </div>
+            <div class="card-body">
+                {% if recent_visits %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead>
+                                <tr>
+                                    <th>التاريخ والوقت</th>
+                                    <th>IP Address</th>
+                                    <th>المتصفح</th>
+                                    <th>نوع الجهاز</th>
+                                    <th>الصفحة</th>
+                                    <th>المستخدم</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for visit in recent_visits %}
+                                <tr>
+                                    <td>{{ visit.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                    <td><code>{{ visit.ip_address }}</code></td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ visit.browser }}</span>
+                                    </td>
+                                    <td>
+                                        {% if visit.device_type == 'Mobile' %}
+                                            <span class="badge bg-success">جوال</span>
+                                        {% elif visit.device_type == 'Tablet' %}
+                                            <span class="badge bg-info">تابلت</span>
+                                        {% elif visit.device_type == 'Desktop' %}
+                                            <span class="badge bg-secondary">كمبيوتر</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ visit.device_type }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><code>{{ visit.page_path }}</code></td>
+                                    <td>
+                                        {% if visit.user %}
+                                            <span class="badge bg-warning text-dark">{{ visit.user.username }}</span>
+                                        {% else %}
+                                            <span class="text-muted">زائر</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if visits_pagination.pages > 1 %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center mt-3">
+                            <!-- Previous -->
+                            {% if visits_pagination.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('dashboard', page=visits_pagination.prev_num) }}">
+                                    <i class="bi bi-chevron-right"></i> السابق
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="bi bi-chevron-right"></i> السابق</span>
+                            </li>
+                            {% endif %}
+                            
+                            <!-- Page Numbers -->
+                            {% for page_num in visits_pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                                {% if page_num %}
+                                    {% if page_num == visits_pagination.page %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ page_num }}</span>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('dashboard', page=page_num) }}">{{ page_num }}</a>
+                                    </li>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            <!-- Next -->
+                            {% if visits_pagination.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('dashboard', page=visits_pagination.next_num) }}">
+                                    التالي <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">التالي <i class="bi bi-chevron-left"></i></span>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    <div class="text-center text-muted mt-2">
+                        عرض {{ visits_pagination.per_page }} من {{ visits_pagination.total }} زيارة
+                        (الصفحة {{ visits_pagination.page }} من {{ visits_pagination.pages }})
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted text-center">لا توجد زيارات مسجلة</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- روابط سريعة -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0 d-flex align-items-center">
+                    <i class="bi bi-link-45deg ms-2"></i>روابط سريعة
+                </h5>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('admin_users') }}" class="btn btn-primary me-2 mb-2">
+                    <i class="bi bi-people-fill ms-1"></i>إدارة المستخدمين
+                </a>
+                <a href="{{ url_for('home') }}" class="btn btn-secondary me-2 mb-2">
+                    <i class="bi bi-house-fill ms-1"></i>الصفحة الرئيسية
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

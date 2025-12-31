@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}البروفايل - {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                {% if user.profile_picture %}
+                <img src="{{ url_for('uploaded_file', filename=user.profile_picture) }}" 
+                     alt="{{ user.username }}" 
+                     class="rounded-circle mb-3" 
+                     style="width: 150px; height: 150px; object-fit: cover; border: 4px solid #3498db;">
+                {% else %}
+                <div class="rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" 
+                     style="width: 150px; height: 150px; background: linear-gradient(135deg, #2c3e50, #3498db); color: white; font-size: 3rem;">
+                    {{ user.username[0].upper() }}
+                </div>
+                {% endif %}
+                <h3 class="card-title">{{ user.full_name or user.username }}</h3>
+                <p class="text-muted">@{{ user.username }}</p>
+                
+                {% if user.bio %}
+                <p class="card-text">{{ user.bio }}</p>
+                {% endif %}
+                
+                <div class="mt-3">
+                    {% if user.location %}
+                    <p class="mb-2 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-geo-alt-fill ms-2 text-primary"></i>{{ user.location }}
+                    </p>
+                    {% endif %}
+                    {% if user.website %}
+                    <p class="mb-2 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-link-45deg ms-2 text-primary"></i>
+                        <a href="{{ user.website }}" target="_blank" class="text-decoration-none">{{ user.website }}</a>
+                    </p>
+                    {% endif %}
+                    <p class="mb-2 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-envelope ms-2 text-primary"></i>{{ user.email }}
+                    </p>
+                    <p class="mb-2 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-calendar ms-2 text-primary"></i>
+                        انضم في {{ user.created_at.strftime('%Y-%m-%d') }}
+                    </p>
+                </div>
+                
+                <a href="{{ url_for('edit_profile') }}" class="btn btn-primary mt-3">
+                    <i class="bi bi-pencil-fill ms-2"></i>تعديل البروفايل
+                </a>
+            </div>
+        </div>
+        
+        <!-- إحصائيات -->
+        <div class="card border-0 shadow-sm mt-3">
+            <div class="card-body">
+                <h5 class="card-title">الإحصائيات</h5>
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="h4 text-primary">{{ user.ideas|length }}</div>
+                        <small class="text-muted">فكرة</small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="h4 text-success">{{ user.comments|length }}</div>
+                        <small class="text-muted">تعليق</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h4 class="mb-0 d-flex align-items-center">
+                    <i class="bi bi-lightbulb-fill ms-2 text-warning"></i>
+                    أفكاري ({{ user.ideas|length }})
+                </h4>
+            </div>
+            <div class="card-body">
+                {% if user.ideas %}
+                <div class="list-group list-group-flush">
+                    {% for idea in user.ideas %}
+                    <div class="list-group-item border-0 px-0">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1">
+                                    <a href="{{ url_for('view_idea', idea_id=idea.id) }}" class="text-decoration-none">
+                                        {{ idea.title }}
+                                    </a>
+                                </h5>
+                                <p class="mb-2 text-muted">{{ idea.description[:150] }}{% if idea.description|length > 150 %}...{% endif %}</p>
+                                <div class="d-flex align-items-center flex-wrap gap-2">
+                                    <span class="badge bg-primary">{{ idea.category }}</span>
+                                    <small class="text-muted d-flex align-items-center">
+                                        <i class="bi bi-eye ms-1"></i>{{ idea.views }} مشاهدة
+                                    </small>
+                                    <small class="text-muted d-flex align-items-center">
+                                        <i class="bi bi-chat ms-1"></i>{{ idea.comments|length }} تعليق
+                                    </small>
+                                    <small class="text-muted d-flex align-items-center">
+                                        <i class="bi bi-clock ms-1"></i>{{ idea.created_at.strftime('%Y-%m-%d') }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if not loop.last %}
+                    <hr>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-lightbulb" style="font-size: 3rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3">لم تقم بنشر أي أفكار بعد</p>
+                    <a href="{{ url_for('submit_idea') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle-fill ms-2"></i>أضف فكرتك الأولى
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
