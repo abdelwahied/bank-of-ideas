@@ -23,7 +23,7 @@ services:
     build: .
     container_name: bank-of-ideas
     ports:
-      - "4000:4000"
+      - "5000:4000"
     volumes:
       - ./static/uploads:/app/static/uploads
     environment:
