@@ -36,7 +36,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Google OAuth configuration
 app.config['GOOGLE_OAUTH_CLIENT_ID'] = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
 app.config['GOOGLE_OAUTH_CLIENT_SECRET'] = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET')
-app.config['SERVER_NAME'] = os.environ.get('SERVER_NAME', 'localhost:4000')
+# SERVER_NAME معطل للإنتاج - يسبب مشاكل مع الوصول من IP خارجي
+# app.config['SERVER_NAME'] = os.environ.get('SERVER_NAME', 'localhost:4000')
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
