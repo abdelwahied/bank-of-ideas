@@ -15,8 +15,8 @@ import re
 # تحميل متغيرات البيئة من ملف .env
 load_dotenv()
 
-# Allow OAuth2 over HTTP in development
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+# Allow OAuth2 over HTTP in development only (set OAUTHLIB_INSECURE_TRANSPORT=1 in .env if needed)
+# في الإنتاج يجب استخدام HTTPS فقط
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24).hex())

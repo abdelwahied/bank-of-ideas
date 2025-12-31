@@ -5,9 +5,9 @@ services:
     image: postgres:15-alpine
     container_name: bank-of-ideas-db
     environment:
-      - POSTGRES_DB=bank_of_ideas
-      - POSTGRES_USER=bank_user
-      - POSTGRES_PASSWORD=bank_password
+      - POSTGRES_DB=${POSTGRES_DB:-bank_of_ideas}
+      - POSTGRES_USER=${POSTGRES_USER:-bank_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-bank_password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -30,7 +30,7 @@ services:
       - FLASK_APP=app.py
       - FLASK_ENV=production
       - PYTHONUNBUFFERED=1
-      - DATABASE_URL=postgresql://bank_user:bank_password@db:5432/bank_of_ideas
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-bank_user}:${POSTGRES_PASSWORD:-bank_password}@db:5432/${POSTGRES_DB:-bank_of_ideas}
       - SECRET_KEY=${SECRET_KEY:-change-this-secret-key-in-production}
     depends_on:
       db:
