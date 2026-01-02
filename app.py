@@ -668,10 +668,16 @@ def dashboard():
     
     # 5. معدل الارتداد (Bounce Rate) - الزوار الذين زاروا صفحة واحدة فقط
     # نحسب نسبة الزوار الذين لديهم زيارة واحدة فقط
-    single_page_visits = db.session.query(Visit.ip_address).group_by(Visit.ip_address).having(
-        db.func.count(Visit.id) == 1
-    ).count()
-    bounce_rate = (single_page_visits / unique_ips * 100) if unique_ips > 0 else 0
+    try:
+        single_page_visits = db.session.query(Visit.ip_address).group_by(Visit.ip_address).having(
+            db.func.count(Visit.id) == 1
+        ).count()
+        bounce_rate = (single_page_visits / unique_ips * 100) if unique_ips > 0 else 0
+    except Exception as e:
+        # في حالة حدوث خطأ، استخدم قيمة افتراضية
+        app.logger.error(f"Error calculating bounce rate: {e}")
+        bounce_rate = 0
+        single_page_visits = 0
     bounce_rate_status = "ممتاز" if bounce_rate < 40 else "جيد" if bounce_rate < 60 else "يحتاج تحسين"
     
     # 6. متوسط مدة الجلسة (تقدير بناءً على عدد الصفحات)
