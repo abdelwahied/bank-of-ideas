@@ -344,12 +344,10 @@ if google_bp:
 
             login_user(user)
             flash('تم تسجيل الدخول بنجاح باستخدام Google!', 'success')
-            # Flask-Dance يتوقع إرجاع False لإيقاف المعالجة التلقائية
-            # ثم يقوم Flask-Dance بإعادة التوجيه تلقائياً إلى next أو الصفحة الرئيسية
-            # نحفظ next_url في session لإعادة التوجيه لاحقاً
+            # إعادة التوجيه مباشرة إلى الصفحة الرئيسية
+            # Flask-Dance سيتعامل مع Response object
             next_url = request.args.get('next') or url_for('home')
-            session['next'] = next_url
-            return False
+            return redirect(next_url)
         except Exception as e:
             app.logger.error(f'❌ خطأ في تسجيل الدخول باستخدام Google: {e}', exc_info=True)
             flash('حدث خطأ أثناء تسجيل الدخول باستخدام Google', 'danger')
