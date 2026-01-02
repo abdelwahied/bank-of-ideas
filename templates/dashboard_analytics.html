@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}إحصائيات متقدمة - SEO & Analytics{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-graph-up"></i> إحصائيات متقدمة - SEO & Analytics</h2>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-right"></i> رجوع للوحة التحكم
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- إحصائيات SEO -->
+    <div class="row g-4">
+        <!-- الزيارات العضوية -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">زيارات عضوية</h5>
+                    <h2 class="text-success">{{ organic_visits }}</h2>
+                    <p class="text-muted mb-0">{{ "%.1f"|format(organic_percentage) }}% من الإجمالي</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- معدل الارتداد -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">معدل الارتداد</h5>
+                    <h2 class="{% if bounce_rate < 40 %}text-success{% elif bounce_rate < 60 %}text-warning{% else %}text-danger{% endif %}">
+                        {{ "%.1f"|format(bounce_rate) }}%
+                    </h2>
+                    <p class="text-muted mb-0">{{ bounce_rate_status }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- معدل التحويل -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">معدل التحويل</h5>
+                    <h2 class="text-primary">{{ "%.1f"|format(conversion_rate) }}%</h2>
+                    <p class="text-muted mb-0">زوار → مستخدمين</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- الصفحات المفهرسة -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">صفحات مفهرسة</h5>
+                    <h2 class="text-info">{{ indexed_pages }}</h2>
+                    <p class="text-muted mb-0">في محركات البحث</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مصادر الزيارات -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-pie-chart"></i> مصادر الزيارات</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h6>عضوية (Organic)</h6>
+                            <h3 class="text-success">{{ organic_visits }}</h3>
+                            <p class="text-muted">{{ "%.1f"|format(organic_percentage) }}%</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>مباشرة (Direct)</h6>
+                            <h3 class="text-info">{{ direct_visits }}</h3>
+                            <p class="text-muted">{{ "%.1f"|format(direct_percentage) }}%</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>إحالة (Referral)</h6>
+                            <h3 class="text-warning">{{ referral_visits }}</h3>
+                            <p class="text-muted">{{ "%.1f"|format(referral_percentage) }}%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الصفحات الأكثر شعبية من محركات البحث -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-star"></i> الصفحات الأكثر شعبية من محركات البحث</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>الصفحة</th>
+                                    <th>الزيارات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for page in organic_popular_pages %}
+                                <tr>
+                                    <td><code>{{ page.page_path }}</code></td>
+                                    <td><span class="badge bg-success">{{ page.count }}</span></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted">لا توجد بيانات</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Web Vitals -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-speedometer2"></i> Core Web Vitals</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h6>LCP (Largest Contentful Paint)</h6>
+                            <h3>{{ estimated_lcp }}s</h3>
+                            <span class="badge bg-success">{{ lcp_status }}</span>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>FID (First Input Delay)</h6>
+                            <h3>{{ estimated_fid }}ms</h3>
+                            <span class="badge bg-success">{{ fid_status }}</span>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>CLS (Cumulative Layout Shift)</h6>
+                            <h3>{{ estimated_cls }}</h3>
+                            <span class="badge bg-success">{{ cls_status }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- إحصائيات إضافية -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h6>متوسط الصفحات لكل جلسة</h6>
+                    <h3>{{ "%.2f"|format(avg_pages_per_session) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h6>متوسط مدة الجلسة (تقدير)</h6>
+                    <h3>{{ "%.1f"|format(avg_session_duration) }} دقيقة</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

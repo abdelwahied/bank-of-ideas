@@ -5,9 +5,14 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col-12">
-        <h1 class="mb-4 d-flex align-items-center">
-            <i class="bi bi-speedometer2 ms-2"></i>لوحة التحكم
-        </h1>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="d-flex align-items-center mb-0">
+                <i class="bi bi-speedometer2 ms-2"></i>لوحة التحكم
+            </h1>
+            <a href="{{ url_for('dashboard_analytics') }}" class="btn btn-primary">
+                <i class="bi bi-graph-up"></i> إحصائيات متقدمة (SEO)
+            </a>
+        </div>
     </div>
 </div>
 
