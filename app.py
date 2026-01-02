@@ -269,12 +269,29 @@ else:
                 blueprint_kwargs['redirect_url'] = redirect_url
                 app.logger.info(f'   Redirect URL: {redirect_url}')
             
-            google_bp = make_google_blueprint(**blueprint_kwargs)
-            app.logger.info(f'✅ تم إنشاء Google OAuth blueprint')
-            app.logger.info(f'   Client ID: {client_id[:20]}...')
-            app.logger.info(f'   Server Name: {app.config.get("SERVER_NAME", "Not set")}')
-            app.register_blueprint(google_bp, url_prefix='/login')
-            app.logger.info(f'✅ تم تفعيل Google OAuth بنجاح')
+            # التحقق من أن client_id و client_secret موجودان قبل إنشاء blueprint
+            if not client_id or not client_secret:
+                app.logger.error('❌ خطأ: client_id أو client_secret فارغة قبل إنشاء blueprint!')
+                app.logger.error(f'   client_id: {repr(client_id)}')
+                app.logger.error(f'   client_secret: {"SET" if client_secret else "NOT SET"}')
+                google_bp = None
+            else:
+                app.logger.info(f'📋 إنشاء Google OAuth blueprint...')
+                app.logger.info(f'   Client ID: {client_id[:30]}...')
+                app.logger.info(f'   Client Secret: {"SET" if client_secret else "NOT SET"}')
+                app.logger.info(f'   Redirect URL: {blueprint_kwargs.get("redirect_url", "Not set")}')
+                app.logger.info(f'   Server Name: {app.config.get("SERVER_NAME", "Not set")}')
+                
+                google_bp = make_google_blueprint(**blueprint_kwargs)
+                app.logger.info(f'✅ تم إنشاء Google OAuth blueprint بنجاح')
+                
+                # التحقق من أن blueprint تم إنشاؤه بشكل صحيح
+                if google_bp:
+                    app.register_blueprint(google_bp, url_prefix='/login')
+                    app.logger.info(f'✅ تم تسجيل Google OAuth blueprint بنجاح')
+                else:
+                    app.logger.error('❌ خطأ: blueprint لم يتم إنشاؤه!')
+                    google_bp = None
         except Exception as e:
             app.logger.error(f'❌ خطأ في إنشاء Google OAuth blueprint: {e}', exc_info=True)
             app.logger.error(f'   Client ID موجود: {bool(client_id)}')
