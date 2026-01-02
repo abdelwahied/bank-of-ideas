@@ -722,7 +722,7 @@ def dashboard():
     referral_percentage = (referral_visits / total_visits * 100) if total_visits > 0 else 0
     
     try:
-        response = render_template('dashboard.html',
+        return render_template('dashboard.html',
                          total_users=total_users,
                          total_ideas=total_ideas,
                          total_comments=total_comments,
@@ -761,9 +761,6 @@ def dashboard():
                          referral_visits=referral_visits,
                          referral_percentage=referral_percentage,
                          avg_pages_per_session=avg_pages_per_session)
-        # إضافة Content-Length header لضمان اكتمال الاستجابة
-        response.headers['Content-Length'] = str(len(response.get_data()))
-        return response
     except Exception as e:
         app.logger.error(f"Error rendering dashboard: {e}", exc_info=True)
         flash('حدث خطأ في تحميل لوحة التحكم. يرجى المحاولة مرة أخرى.', 'danger')
