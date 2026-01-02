@@ -245,7 +245,10 @@ else:
                 'https://www.googleapis.com/auth/userinfo.profile',
                 'openid'
             ],
-            'storage': SQLAlchemyStorage(OAuth, db.session, user=current_user)
+            'storage': SQLAlchemyStorage(OAuth, db.session, user=current_user),
+            # إضافة offline=False لضمان عدم استخدام refresh token
+            # هذا قد يساعد في تجنب مشاكل state
+            'offline': False
         }
         
         # إذا كان SERVER_NAME موجود، استخدمه لإعداد redirect_url
