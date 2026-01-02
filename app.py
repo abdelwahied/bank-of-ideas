@@ -232,12 +232,19 @@ else:
         if redirect_url:
             blueprint_kwargs['redirect_url'] = redirect_url
         
-        google_bp = make_google_blueprint(**blueprint_kwargs)
-        app.logger.info(f'✅ تم إنشاء Google OAuth blueprint')
-        app.logger.info(f'   Client ID: {client_id[:20]}...')
-        app.logger.info(f'   Redirect URL: {redirect_url}')
-    app.register_blueprint(google_bp, url_prefix='/login')
-    app.logger.info(f'✅ تم تفعيل Google OAuth بنجاح. Redirect URL: {redirect_url}')
+        try:
+            google_bp = make_google_blueprint(**blueprint_kwargs)
+            app.logger.info(f'✅ تم إنشاء Google OAuth blueprint')
+            app.logger.info(f'   Client ID: {client_id[:20]}...')
+            app.logger.info(f'   Redirect URL: {redirect_url}')
+            app.register_blueprint(google_bp, url_prefix='/login')
+            app.logger.info(f'✅ تم تفعيل Google OAuth بنجاح. Redirect URL: {redirect_url}')
+        except Exception as e:
+            app.logger.error(f'❌ خطأ في إنشاء Google OAuth blueprint: {e}')
+            app.logger.error(f'   Client ID موجود: {bool(client_id)}')
+            app.logger.error(f'   Client Secret موجود: {bool(client_secret)}')
+            app.logger.error(f'   Redirect URL: {redirect_url}')
+            google_bp = None
 
 @login_manager.user_loader
 def load_user(user_id):
