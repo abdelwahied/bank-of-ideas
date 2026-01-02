@@ -217,6 +217,8 @@ else:
         google_bp = None
     else:
         # بناء معاملات blueprint
+        # ملاحظة: لا نمرر redirect_url، نترك Flask-Dance يستخدم القيمة الافتراضية
+        # Flask-Dance سيبني redirect_url تلقائياً بناءً على SERVER_NAME
         blueprint_kwargs = {
             'client_id': client_id,
             'client_secret': client_secret,
@@ -228,22 +230,23 @@ else:
             'storage': SQLAlchemyStorage(OAuth, db.session, user=current_user)
         }
         
-        # إضافة redirect_url فقط إذا كان موجوداً
-        if redirect_url:
-            blueprint_kwargs['redirect_url'] = redirect_url
+        # إذا كان SERVER_NAME موجود، استخدمه لإعداد redirect_url
+        # لكن لا نمرره مباشرة، بل نترك Flask-Dance يبنيها تلقائياً
+        if app.config.get('SERVER_NAME'):
+            # Flask-Dance سيبني redirect_url تلقائياً من SERVER_NAME
+            pass
         
         try:
             google_bp = make_google_blueprint(**blueprint_kwargs)
             app.logger.info(f'✅ تم إنشاء Google OAuth blueprint')
             app.logger.info(f'   Client ID: {client_id[:20]}...')
-            app.logger.info(f'   Redirect URL: {redirect_url}')
+            app.logger.info(f'   Server Name: {app.config.get("SERVER_NAME", "Not set")}')
             app.register_blueprint(google_bp, url_prefix='/login')
-            app.logger.info(f'✅ تم تفعيل Google OAuth بنجاح. Redirect URL: {redirect_url}')
+            app.logger.info(f'✅ تم تفعيل Google OAuth بنجاح')
         except Exception as e:
-            app.logger.error(f'❌ خطأ في إنشاء Google OAuth blueprint: {e}')
+            app.logger.error(f'❌ خطأ في إنشاء Google OAuth blueprint: {e}', exc_info=True)
             app.logger.error(f'   Client ID موجود: {bool(client_id)}')
             app.logger.error(f'   Client Secret موجود: {bool(client_secret)}')
-            app.logger.error(f'   Redirect URL: {redirect_url}')
             google_bp = None
 
 @login_manager.user_loader
