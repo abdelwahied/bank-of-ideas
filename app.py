@@ -292,6 +292,19 @@ else:
                 if google_bp:
                     app.register_blueprint(google_bp, url_prefix='/login')
                     app.logger.info(f'✅ تم تسجيل Google OAuth blueprint بنجاح')
+                    
+                    # إضافة route مخصص لإعادة التوجيه بعد تسجيل الدخول
+                    # هذا route يتم استدعاؤه بعد أن يقوم Flask-Dance بمعالجة OAuth
+                    @app.route('/login/google/authorized')
+                    def google_authorized_redirect():
+                        """إعادة التوجيه بعد تسجيل الدخول باستخدام Google"""
+                        # التحقق من أن المستخدم مسجل دخول
+                        if current_user.is_authenticated:
+                            next_url = session.pop('oauth_next', None) or url_for('home')
+                            return redirect(next_url)
+                        else:
+                            # إذا لم يكن مسجل دخول، إعادة التوجيه إلى صفحة تسجيل الدخول
+                            return redirect(url_for('login'))
                 else:
                     app.logger.error('❌ خطأ: blueprint لم يتم إنشاؤه!')
                     google_bp = None
