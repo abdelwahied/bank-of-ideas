@@ -26,12 +26,16 @@ services:
       - "${WEB_PORT:-4000}:4000"
     volumes:
       - ./static/uploads:/app/static/uploads
+    env_file:
+      - .env
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=production
       - PYTHONUNBUFFERED=1
       - DATABASE_URL=postgresql://${POSTGRES_USER:-bank_user}:${POSTGRES_PASSWORD:-bank_password}@db:5432/${POSTGRES_DB:-bank_of_ideas}
       - SECRET_KEY=${SECRET_KEY:-change-this-secret-key-in-production}
+      - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID}
+      - GOOGLE_OAUTH_CLIENT_SECRET=${GOOGLE_OAUTH_CLIENT_SECRET}
     depends_on:
       db:
         condition: service_healthy
