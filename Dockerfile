@@ -24,6 +24,9 @@ ENV PYTHONUNBUFFERED=1
 # فتح المنفذ
 EXPOSE 4000
 
-# تشغيل التطبيق
-CMD ["python", "app.py"]
+# تشغيل التطبيق باستخدام Gunicorn للإنتاج
+# --timeout 300: زيادة timeout للصفحات الثقيلة مثل Dashboard
+# --workers 4: عدد العمال (processes)
+# --bind 0.0.0.0:4000: الاستماع على جميع الـ interfaces
+CMD ["gunicorn", "--timeout", "300", "--workers", "4", "--bind", "0.0.0.0:4000", "app:app"]
 
