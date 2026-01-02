@@ -34,7 +34,14 @@ app.wsgi_app = ProxyFix(
     x_prefix=1
 )
 
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24).hex())
+# SECRET_KEY يجب أن يكون ثابتاً لتجنب مشاكل الجلسات
+# إذا لم يكن موجوداً في البيئة، استخدم قيمة افتراضية ثابتة للتطوير فقط
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production-12345')
+
+# إعدادات الجلسات لضمان عمل OAuth بشكل صحيح
+app.config['SESSION_COOKIE_SECURE'] = False  # للتطوير المحلي (HTTP)
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # إعدادات قاعدة البيانات
 # دعم SQLite للتطوير و PostgreSQL للإنتاج
@@ -237,6 +244,13 @@ else:
             pass
         
         try:
+            # إضافة redirect_url بشكل صريح لتجنب مشاكل state mismatch
+            if app.config.get('SERVER_NAME'):
+                scheme = 'http' if ('localhost' in app.config['SERVER_NAME'] or '127.0.0.1' in app.config['SERVER_NAME']) else 'https'
+                redirect_url = f"{scheme}://{app.config['SERVER_NAME']}/login/google/authorized"
+                blueprint_kwargs['redirect_url'] = redirect_url
+                app.logger.info(f'   Redirect URL: {redirect_url}')
+            
             google_bp = make_google_blueprint(**blueprint_kwargs)
             app.logger.info(f'✅ تم إنشاء Google OAuth blueprint')
             app.logger.info(f'   Client ID: {client_id[:20]}...')
