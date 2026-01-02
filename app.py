@@ -53,12 +53,16 @@ app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'bank_of_ideas:'
 
 # إعدادات الجلسات لضمان عمل OAuth بشكل صحيح
+# استخدام signed cookies مع إعدادات محسّنة
 app.config['SESSION_COOKIE_SECURE'] = False  # للتطوير المحلي (HTTP)
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-# إعدادات إضافية لضمان عمل الجلسات بشكل صحيح
+app.config['SESSION_COOKIE_NAME'] = 'bank_of_ideas_session'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 app.config['SESSION_REFRESH_EACH_REQUEST'] = True
+# إعدادات مهمة لحل مشكلة state
+app.config['SESSION_COOKIE_DOMAIN'] = None  # لا نحدد domain للمحلي
+app.config['SESSION_COOKIE_PATH'] = '/'
 
 # إعدادات قاعدة البيانات
 # دعم SQLite للتطوير و PostgreSQL للإنتاج
