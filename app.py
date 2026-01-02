@@ -344,11 +344,12 @@ if google_bp:
 
             login_user(user)
             flash('تم تسجيل الدخول بنجاح باستخدام Google!', 'success')
-            # Flask-Dance: إرجاع Response لإعادة التوجيه
-            # نرجع redirect مباشرة - Flask-Dance سيتعامل معه
+            # Flask-Dance: إرجاع False للسماح لـ Flask-Dance بإعادة التوجيه إلى /login/google/authorized
+            # ثم نضيف route مخصص لإعادة التوجيه إلى الصفحة الرئيسية
+            # حفظ next_url في session لإعادة التوجيه لاحقاً
             next_url = request.args.get('next') or url_for('home')
-            # إرجاع Response object لإعادة التوجيه
-            return redirect(next_url)
+            session['oauth_next'] = next_url
+            return False
         except Exception as e:
             app.logger.error(f'❌ خطأ في تسجيل الدخول باستخدام Google: {e}', exc_info=True)
             flash('حدث خطأ أثناء تسجيل الدخول باستخدام Google', 'danger')
