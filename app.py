@@ -356,9 +356,29 @@ if google_bp:
                 db.session.add(user)
                 db.session.commit()
 
-        login_user(user)
-        flash('تم تسجيل الدخول بنجاح باستخدام Google!', 'success')
-        return False
+            login_user(user)
+            flash('تم تسجيل الدخول بنجاح باستخدام Google!', 'success')
+            return False
+        except Exception as e:
+            app.logger.error(f'❌ خطأ في تسجيل الدخول باستخدام Google: {e}', exc_info=True)
+            flash('حدث خطأ أثناء تسجيل الدخول باستخدام Google', 'danger')
+            return False
+
+# معالجة خطأ MismatchingStateError بشكل خاص
+@app.errorhandler(Exception)
+def handle_oauth_error(e):
+    """معالجة أخطاء OAuth خاصة MismatchingStateError"""
+    from oauthlib.oauth2.rfc6749.errors import MismatchingStateError
+    
+    if isinstance(e, MismatchingStateError) or 'MismatchingStateError' in str(type(e)) or 'mismatching_state' in str(e):
+        app.logger.warning(f'⚠️ MismatchingStateError: {e}')
+        # إعادة توجيه إلى صفحة تسجيل الدخول مع رسالة
+        flash('حدث خطأ في جلسة تسجيل الدخول. يرجى المحاولة مرة أخرى بعد مسح cookies.', 'warning')
+        # مسح الجلسة الحالية
+        session.clear()
+        return redirect(url_for('login'))
+    # للأخطاء الأخرى، نترك Flask يتعامل معها
+    raise e
 
 # إضافة cache headers للـ static files
 @app.after_request
