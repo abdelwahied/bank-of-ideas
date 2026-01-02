@@ -198,7 +198,11 @@ else:
     # بناء redirect URL بشكل صحيح
     if app.config.get('SERVER_NAME'):
         # إذا كان SERVER_NAME موجود، استخدمه مع scheme
+        # للمحلي: http، للإنتاج: https
         scheme = app.config.get('PREFERRED_URL_SCHEME', 'https')
+        # إذا كان localhost، استخدم http دائماً
+        if 'localhost' in app.config['SERVER_NAME'] or '127.0.0.1' in app.config['SERVER_NAME']:
+            scheme = 'http'
         redirect_url = f"{scheme}://{app.config['SERVER_NAME']}/login/google/authorized"
     else:
         # إذا لم يكن موجود، استخدم القيمة الافتراضية
