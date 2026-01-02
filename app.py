@@ -716,7 +716,8 @@ def dashboard():
     referral_visits = total_visits - organic_visits - direct_visits
     referral_percentage = (referral_visits / total_visits * 100) if total_visits > 0 else 0
     
-    return render_template('dashboard.html',
+    try:
+        response = render_template('dashboard.html',
                          total_users=total_users,
                          total_ideas=total_ideas,
                          total_comments=total_comments,
