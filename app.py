@@ -1212,6 +1212,26 @@ def dashboard_analytics():
         flash('حدث خطأ في تحميل الإحصائيات المتقدمة.', 'danger')
         return redirect(url_for('dashboard'))
 
+# Route للتحقق من إعدادات Google OAuth (للتطوير فقط)
+@app.route('/debug/google-oauth')
+def debug_google_oauth():
+    """Route للتحقق من إعدادات Google OAuth"""
+    if app.config.get('FLASK_ENV') != 'development':
+        return "Not available in production", 403
+    
+    info = {
+        'google_oauth_enabled': google_oauth_enabled,
+        'client_id': app.config.get('GOOGLE_OAUTH_CLIENT_ID', 'NOT SET'),
+        'client_secret': 'SET' if app.config.get('GOOGLE_OAUTH_CLIENT_SECRET') else 'NOT SET',
+        'server_name': app.config.get('SERVER_NAME', 'NOT SET'),
+        'redirect_url': f"http://{app.config.get('SERVER_NAME', 'localhost:4000')}/login/google/authorized" if app.config.get('SERVER_NAME') else 'NOT SET',
+        'google_bp_exists': google_bp is not None,
+        'secret_key': app.config.get('SECRET_KEY', 'NOT SET')[:20] + '...' if app.config.get('SECRET_KEY') else 'NOT SET'
+    }
+    
+    from flask import jsonify
+    return jsonify(info)
+
 if __name__ == '__main__':
     with app.app_context():
         # إنشاء الجداول إذا لم تكن موجودة
