@@ -313,33 +313,34 @@ if google_bp:
             flash('فشل تسجيل الدخول باستخدام Google', 'danger')
             return False
 
-        resp = google.get('/oauth2/v2/userinfo')
-        if not resp.ok:
-            flash('فشل في الحصول على معلومات المستخدم من Google', 'danger')
-            return False
+        try:
+            resp = google.get('/oauth2/v2/userinfo')
+            if not resp.ok:
+                flash('فشل في الحصول على معلومات المستخدم من Google', 'danger')
+                return False
 
-        google_info = resp.json()
-        google_id = google_info['id']
-        email = google_info['email']
-        username = email.split('@')[0]  # Use email username as default username
+            google_info = resp.json()
+            google_id = google_info['id']
+            email = google_info['email']
+            username = email.split('@')[0]  # Use email username as default username
 
-        # Check if user exists
-        user = User.query.filter_by(google_id=google_id).first()
-        if not user:
-            # Check if email exists
-            user = User.query.filter_by(email=email).first()
-            if user:
-                # Update existing user with Google ID
-                user.google_id = google_id
-            else:
-                # Create new user
-                user = User(
-                    username=username,
-                    email=email,
-                    google_id=google_id
-                )
-                db.session.add(user)
-                db.session.commit()
+            # Check if user exists
+            user = User.query.filter_by(google_id=google_id).first()
+            if not user:
+                # Check if email exists
+                user = User.query.filter_by(email=email).first()
+                if user:
+                    # Update existing user with Google ID
+                    user.google_id = google_id
+                else:
+                    # Create new user
+                    user = User(
+                        username=username,
+                        email=email,
+                        google_id=google_id
+                    )
+                    db.session.add(user)
+                    db.session.commit()
 
             login_user(user)
             flash('تم تسجيل الدخول بنجاح باستخدام Google!', 'success')
