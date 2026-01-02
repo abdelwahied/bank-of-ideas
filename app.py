@@ -42,26 +42,16 @@ if server_name and 'localhost' not in server_name and '127.0.0.1' not in server_
 # إذا لم يكن موجوداً في البيئة، استخدم قيمة افتراضية ثابتة للتطوير فقط
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production-12345')
 
-# استخدام Flask-Session لتخزين الجلسات على الخادم بدلاً من cookies
-# هذا يحل مشكلة MismatchingStateError في OAuth
-app.config['SESSION_TYPE'] = 'filesystem'  # تخزين الجلسات في ملفات
-app.config['SESSION_FILE_DIR'] = '/tmp/flask_session'  # مجلد مؤقت للجلسات
-app.config['SESSION_FILE_THRESHOLD'] = 100
-app.config['SESSION_PERMANENT'] = False
-app.config['SESSION_USE_SIGNER'] = True
-app.config['SESSION_KEY_PREFIX'] = 'bank_of_ideas:'
-
 # إعدادات الجلسات لضمان عمل OAuth بشكل صحيح
-# استخدام signed cookies مع إعدادات محسّنة
+# استخدام signed cookies مع إعدادات محسّنة لحل مشكلة state
 app.config['SESSION_COOKIE_SECURE'] = False  # للتطوير المحلي (HTTP)
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_NAME'] = 'bank_of_ideas_session'
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
-app.config['SESSION_REFRESH_EACH_REQUEST'] = True
-# إعدادات مهمة لحل مشكلة state
 app.config['SESSION_COOKIE_DOMAIN'] = None  # لا نحدد domain للمحلي
 app.config['SESSION_COOKIE_PATH'] = '/'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
+app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 
 # إعدادات قاعدة البيانات
 # دعم SQLite للتطوير و PostgreSQL للإنتاج
