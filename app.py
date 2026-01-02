@@ -25,14 +25,18 @@ app = Flask(__name__)
 
 # إعداد ProxyFix للعمل خلف reverse proxy (Nginx)
 # هذا يضمن أن Flask يعرف أنه يعمل على HTTPS
-app.wsgi_app = ProxyFix(
-    app.wsgi_app,
-    x_for=1,
-    x_proto=1,
-    x_host=1,
-    x_port=1,
-    x_prefix=1
-)
+# ملاحظة: ProxyFix قد يسبب مشاكل في الجلسات المحلية، لذلك نفعله فقط للإنتاج
+server_name = os.environ.get('SERVER_NAME', '')
+if server_name and 'localhost' not in server_name and '127.0.0.1' not in server_name:
+    # فقط للإنتاج (ليس localhost)
+    app.wsgi_app = ProxyFix(
+        app.wsgi_app,
+        x_for=1,
+        x_proto=1,
+        x_host=1,
+        x_port=1,
+        x_prefix=1
+    )
 
 # SECRET_KEY يجب أن يكون ثابتاً لتجنب مشاكل الجلسات
 # إذا لم يكن موجوداً في البيئة، استخدم قيمة افتراضية ثابتة للتطوير فقط
