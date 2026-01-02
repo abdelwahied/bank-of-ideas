@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}تعديل الفكرة - {{ idea.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">
+                        <i class="bi bi-pencil-square ms-2"></i>تعديل الفكرة
+                    </h2>
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">عنوان الفكرة</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ idea.title }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category" class="form-label">التصنيف</label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">اختر التصنيف</option>
+                                <option value="تكنولوجيا" {% if idea.category == 'تكنولوجيا' %}selected{% endif %}>تكنولوجيا</option>
+                                <option value="تعليم" {% if idea.category == 'تعليم' %}selected{% endif %}>تعليم</option>
+                                <option value="صحة" {% if idea.category == 'صحة' %}selected{% endif %}>صحة</option>
+                                <option value="بيئة" {% if idea.category == 'بيئة' %}selected{% endif %}>بيئة</option>
+                                <option value="اجتماعي" {% if idea.category == 'اجتماعي' %}selected{% endif %}>اجتماعي</option>
+                                <option value="أخرى" {% if idea.category == 'أخرى' %}selected{% endif %}>أخرى</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">وصف الفكرة</label>
+                            <textarea class="form-control" id="description" name="description" rows="6" required>{{ idea.description }}</textarea>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle ms-1"></i>حفظ التعديلات
+                            </button>
+                            <a href="{{ url_for('view_idea', idea_id=idea.id, slug=idea.get_slug()) }}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle ms-1"></i>إلغاء
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

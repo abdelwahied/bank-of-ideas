@@ -1,15 +1,41 @@
 {% extends "base.html" %}
 
-{% block title %}الأكثر تعليقاً{% endblock %}
+{% block title %}الأكثر تعليقاً - بنك الأفكار{% endblock %}
+
+{% block meta_description %}شاهد الأفكار الأكثر تفاعلاً وتعليقاً في بنك الأفكار. اكتشف الأفكار التي تثير النقاش والتفاعل.{% endblock %}
+
+{% block meta_keywords %}أكثر تعليقاً, أفكار تفاعلية, نقاش, تعليقات, بنك الأفكار{% endblock %}
+
+{% block og_title %}الأكثر تعليقاً - بنك الأفكار{% endblock %}
+
+{% block og_description %}شاهد الأفكار الأكثر تفاعلاً وتعليقاً في بنك الأفكار. اكتشف الأفكار التي تثير النقاش والتفاعل.{% endblock %}
+
+{% block og_image_alt %}الأكثر تعليقاً - بنك الأفكار{% endblock %}
+
+{% block twitter_title %}الأكثر تعليقاً - بنك الأفكار{% endblock %}
+
+{% block twitter_description %}شاهد الأفكار الأكثر تفاعلاً وتعليقاً في بنك الأفكار.{% endblock %}
+
+{% block twitter_image_alt %}الأكثر تعليقاً - بنك الأفكار{% endblock %}
 
 {% block content %}
 <div class="row mb-4">
     <div class="col-12">
         <h1 class="display-5 mb-3 d-flex align-items-center">
             <i class="bi bi-chat-fill text-warning ms-2"></i>
-            الأكثر تعليقاً
+            الأفكار الأكثر تعليقاً
         </h1>
-        <p class="lead text-muted">شاهد الأفكار الأكثر تفاعلاً وتعليقاً في المنصة</p>
+        <div class="page-description-section">
+            <p class="lead">شاهد الأفكار الأكثر تفاعلاً وتعليقاً في منصة بنك الأفكار. اكتشف الأفكار التي تثير النقاش والتفاعل بين أعضاء المجتمع.</p>
+            <p>هذه الصفحة تعرض الأفكار الأكثر تفاعلاً بناءً على عدد التعليقات. كلما زاد عدد التعليقات، كلما كانت الفكرة أكثر إثارة للنقاش والتفاعل. الأفكار التفاعلية تساعد في:</p>
+            <ul>
+                <li>بناء مجتمع نشط من المبدعين والمفكرين</li>
+                <li>تطوير الأفكار من خلال النقاشات البناءة</li>
+                <li>تبادل الخبرات والمعرفة بين الأعضاء</li>
+                <li>إنشاء شبكة من العلاقات المهنية والشخصية</li>
+            </ul>
+            <p>شارك في النقاشات وقدم آراءك البناءة. كل تعليق يضيف قيمة للفكرة ويساعد في تطويرها وتحسينها.</p>
+        </div>
     </div>
 </div>
 
@@ -18,9 +44,9 @@
     <div class="col-md-4 mb-4">
         <div class="card h-100">
             <div class="card-body">
-                <h5 class="card-title">{{ idea.title }}</h5>
+                <h2 class="card-title h5">{{ idea.title }}</h2>
                 <h6 class="card-subtitle mb-2 text-muted">
-                    <span class="badge bg-warning text-dark">{{ idea.category }}</span>
+                    <a href="{{ url_for('most_viewed') }}?category={{ idea.category }}" class="badge bg-warning text-dark text-decoration-none">{{ idea.category }}</a>
                 </h6>
                 <p class="card-text">{{ idea.description[:150] }}{% if idea.description|length > 150 %}...{% endif %}</p>
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -33,9 +59,10 @@
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
                     <small class="text-muted d-flex align-items-center">
-                        <i class="bi bi-person ms-1"></i>{{ idea.author.username }}
+                        <i class="bi bi-person ms-1"></i>
+                        <a href="{{ url_for('user_profile', user_id=idea.author.id) }}" class="text-decoration-none text-muted">{{ idea.author.username }}</a>
                     </small>
-                    <a href="{{ url_for('view_idea', idea_id=idea.id) }}" class="btn btn-warning btn-sm">
+                    <a href="{{ url_for('view_idea', idea_id=idea.id, slug=idea.get_slug()) }}" class="btn btn-warning btn-sm">
                         اقرأ المزيد
                     </a>
                 </div>

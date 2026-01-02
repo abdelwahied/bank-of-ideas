@@ -1,53 +1,236 @@
 {% extends "base.html" %}
 
-{% block title %}{{ idea.title }}{% endblock %}
+{% block title %}{{ idea.title }} - بنك الأفكار{% endblock %}
+
+{% block meta_description %}{{ idea.description[:160] }}{% if idea.description|length > 160 %}...{% endif %}{% endblock %}
+
+{% block meta_keywords %}{{ idea.category }}, أفكار, {{ idea.author.username }}, بنك الأفكار{% endblock %}
+
+{% block og_type %}article{% endblock %}
+
+{% block og_title %}{{ idea.title }} - بنك الأفكار{% endblock %}
+
+{% block og_description %}{{ idea.description[:200] }}{% if idea.description|length > 200 %}...{% endif %}{% endblock %}
+
+{% block og_image_alt %}{{ idea.title }} - بنك الأفكار{% endblock %}
+
+{% block og_article %}
+<meta property="article:author" content="{{ idea.author.username }}">
+<meta property="article:published_time" content="{{ idea.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}">
+<meta property="article:section" content="{{ idea.category }}">
+{% endblock %}
+
+{% block twitter_image_alt %}{{ idea.title }} - بنك الأفكار{% endblock %}
+
+{% block canonical_url %}{{ url_for('view_idea', idea_id=idea.id, slug=idea.get_slug(), _external=True) }}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ idea.title|tojson }},
+  "description": {{ (idea.description[:200] + ('...' if idea.description|length > 200 else ''))|tojson }},
+  "author": {
+    "@type": "Person",
+    "name": {{ idea.author.username|tojson }}
+  },
+  "datePublished": "{{ idea.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}",
+  "dateModified": "{{ idea.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}",
+  "publisher": {
+    "@type": "Organization",
+    "name": "بنك الأفكار",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ url_for('static', filename='favicon.svg', _external=True) }}"
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ url_for('view_idea', idea_id=idea.id, slug=idea.get_slug(), _external=True) }}"
+  },
+  "articleSection": {{ idea.category|tojson }}
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "الرئيسية",
+      "item": "{{ url_for('home', _external=True) }}"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "الأفكار",
+      "item": "{{ url_for('most_viewed', _external=True) }}"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": {{ idea.title|tojson }},
+      "item": "{{ url_for('view_idea', idea_id=idea.id, slug=idea.get_slug(), _external=True) }}"
+    }
+  ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
+<div class="container view-idea-content">
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{{ url_for('home') }}">
+                        <i class="bi bi-house-fill ms-1"></i>الرئيسية
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{{ url_for('most_viewed') }}">
+                        <i class="bi bi-lightbulb-fill ms-1"></i>الأفكار
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    <i class="bi bi-file-text ms-1"></i>{{ idea.title }}
+                </li>
+            </ol>
+        </nav>
+        
         <!-- عرض الفكرة -->
-        <div class="card mb-4">
+        <article class="card mb-4">
             <div class="card-body">
                 <h1 class="card-title mb-3">{{ idea.title }}</h1>
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <span class="badge bg-primary">{{ idea.category }}</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="{{ url_for('most_viewed') }}?category={{ idea.category }}" class="badge bg-primary text-decoration-none">{{ idea.category }}</a>
+                    </div>
                     <small class="text-muted">نشر في {{ idea.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
                 </div>
-                <div class="card-text mb-4">
-                    {{ idea.description | safe }}
+                <div class="card-text mb-4 idea-content">
+                    {% if processed_description %}
+                        {{ processed_description | safe }}
+                    {% else %}
+                        {{ idea.description | safe }}
+                    {% endif %}
                 </div>
+                
+                <!-- أزرار مشاركة على منصات التواصل الاجتماعي -->
+                <div class="social-share-section mb-4">
+                    <h6 class="mb-3 d-flex align-items-center">
+                        <i class="bi bi-share-fill ms-2 text-primary"></i>مشاركة الفكرة
+                    </h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% set share_url = url_for('view_idea', idea_id=idea.id, slug=idea.get_slug(), _external=True) %}
+                        {% set share_text = idea.title %}
+                        {% set share_description = idea.description[:100] + '...' if idea.description|length > 100 else idea.description %}
+                        
+                        <!-- تويتر -->
+                        <a href="https://twitter.com/intent/tweet?url={{ share_url|urlencode }}&text={{ share_text|urlencode }}" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="btn btn-sm btn-outline-primary social-share-btn">
+                            <i class="bi bi-twitter ms-1"></i>تويتر
+                        </a>
+                        
+                        <!-- فيسبوك -->
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ share_url|urlencode }}" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="btn btn-sm btn-outline-primary social-share-btn">
+                            <i class="bi bi-facebook ms-1"></i>فيسبوك
+                        </a>
+                        
+                        <!-- واتساب -->
+                        <a href="https://wa.me/?text={{ share_text|urlencode }}%20{{ share_url|urlencode }}" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="btn btn-sm btn-outline-success social-share-btn">
+                            <i class="bi bi-whatsapp ms-1"></i>واتساب
+                        </a>
+                        
+                        <!-- تيليجرام -->
+                        <a href="https://t.me/share/url?url={{ share_url|urlencode }}&text={{ share_text|urlencode }}" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="btn btn-sm btn-outline-info social-share-btn">
+                            <i class="bi bi-telegram ms-1"></i>تيليجرام
+                        </a>
+                        
+                        <!-- لينكد إن -->
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ share_url|urlencode }}" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="btn btn-sm btn-outline-primary social-share-btn">
+                            <i class="bi bi-linkedin ms-1"></i>لينكد إن
+                        </a>
+                        
+                        <!-- نسخ الرابط -->
+                        <button type="button" 
+                                class="btn btn-sm btn-outline-secondary social-share-btn" 
+                                onclick="copyToClipboard(event, '{{ share_url }}')"
+                                title="نسخ الرابط">
+                            <i class="bi bi-link-45deg ms-1"></i>نسخ الرابط
+                        </button>
+                        
+                        <!-- طباعة -->
+                        <button type="button" 
+                                class="btn btn-sm btn-outline-dark social-share-btn" 
+                                onclick="window.print()"
+                                title="طباعة الصفحة">
+                            <i class="bi bi-printer ms-1"></i>طباعة
+                        </button>
+                    </div>
+                </div>
+                
+                {% if idea.description|length < 300 %}
+                <div class="alert alert-info mt-3">
+                    <p class="mb-0"><strong>ملاحظة:</strong> هذه الفكرة تحتوي على وصف مختصر. يمكنك التفاعل معها من خلال إضافة تعليقاتك وآرائك البناءة.</p>
+                </div>
+                {% endif %}
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-3">
                         <small class="text-muted d-flex align-items-center">
-                            <i class="bi bi-person ms-1"></i>بواسطة: {{ idea.author.username }}
+                            <i class="bi bi-person ms-1"></i>بواسطة: <a href="{{ url_for('user_profile', user_id=idea.author.id) }}" class="text-decoration-none">{{ idea.author.username }}</a>
                         </small>
                         <small class="text-muted d-flex align-items-center">
                             <i class="bi bi-eye ms-1"></i>{{ idea.views }} مشاهدة
                         </small>
                     </div>
-                    <a href="{{ url_for('home') }}" class="btn btn-secondary">العودة للرئيسية</a>
-                </div>
+                    <div class="d-flex gap-2">
+                        {% if current_user.is_authenticated and (current_user.id == idea.user_id or current_user.is_admin) %}
+                        <a href="{{ url_for('edit_idea', idea_id=idea.id) }}" class="btn btn-outline-warning">
+                            <i class="bi bi-pencil ms-1"></i>تعديل الفكرة
+                        </a>
+                        {% endif %}
+                        <a href="{{ url_for('most_viewed') }}" class="btn btn-outline-primary">الأكثر مشاهدة</a>
+                        <a href="{{ url_for('home') }}" class="btn btn-secondary">العودة للرئيسية</a>
+                    </div>
             </div>
-        </div>
+        </article>
 
         <!-- نموذج إضافة تعليق -->
         {% if current_user.is_authenticated %}
-        <div class="card mb-4">
+        <section class="card mb-4">
             <div class="card-body">
-                <h3 class="card-title mb-3">إضافة تعليق</h3>
+                <h2 class="card-title mb-3">إضافة تعليق</h2>
                 <form method="POST" action="{{ url_for('add_comment', idea_id=idea.id) }}">
                     <div class="mb-3">
                         <textarea class="form-control" name="content" rows="3" required 
                                 placeholder="اكتب تعليقك هنا..."></textarea>
                     </div>
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center">
+                        <button type="submit" class="btn btn-primary">
                             <i class="bi bi-send ms-1"></i>إرسال التعليق
                         </button>
                     </div>
                 </form>
             </div>
-        </div>
+        </section>
         {% else %}
         <div class="alert alert-info mb-4 d-flex align-items-center">
             <i class="bi bi-info-circle ms-2"></i>
@@ -56,18 +239,18 @@
         {% endif %}
 
         <!-- عرض التعليقات -->
-        <div class="card">
+        <section class="card mb-4">
             <div class="card-body">
-                <h3 class="card-title mb-3 d-flex align-items-center">
+                <h2 class="card-title mb-3 d-flex align-items-center">
                     <i class="bi bi-chat-dots ms-2"></i>
                     التعليقات ({{ comments|length }})
-                </h3>
+                </h2>
                 {% if comments %}
                     {% for comment in comments|sort(attribute='created_at', reverse=true) %}
                     <div class="comment mb-3 pb-3 border-bottom">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <div>
-                                <strong>{{ comment.author.username }}</strong>
+                                <strong><a href="{{ url_for('user_profile', user_id=comment.author.id) }}" class="text-decoration-none">{{ comment.author.username }}</a></strong>
                                 <small class="text-muted ms-2">
                                     {{ comment.created_at.strftime('%Y-%m-%d %H:%M') }}
                                     {% if comment.updated_at %}
@@ -79,7 +262,7 @@
                                 {% if current_user.is_authenticated and current_user.id == idea.user_id %}
                                 <!-- زر نشر/إخفاء التعليق لصاحب الفكرة -->
                                 <form method="POST" action="{{ url_for('toggle_comment_publish', comment_id=comment.id) }}" class="d-inline">
-                                    <button type="submit" class="btn btn-sm btn-{{ 'warning' if comment.is_published else 'secondary' }} d-inline-flex align-items-center" title="{{ 'إخفاء' if comment.is_published else 'نشر' }}">
+                                    <button type="submit" class="btn btn-sm btn-{{ 'warning' if comment.is_published else 'secondary' }}" title="{{ 'إخفاء' if comment.is_published else 'نشر' }}">
                                         <i class="bi bi-{{ 'eye-slash' if comment.is_published else 'eye' }} ms-1"></i>
                                     </button>
                                 </form>
@@ -89,11 +272,11 @@
                                 {% endif %}
                                 {% if current_user.is_authenticated and current_user.id == comment.user_id %}
                                 <!-- أزرار تعديل وحذف التعليق لصاحب التعليق -->
-                                <a href="{{ url_for('edit_comment', comment_id=comment.id) }}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center" title="تعديل">
+                                <a href="{{ url_for('edit_comment', comment_id=comment.id) }}" class="btn btn-sm btn-outline-primary" title="تعديل">
                                     <i class="bi bi-pencil ms-1"></i>
                                 </a>
                                 <form method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا التعليق؟');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center" title="حذف">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="حذف">
                                         <i class="bi bi-trash ms-1"></i>
                                     </button>
                                 </form>
@@ -109,7 +292,271 @@
                     </div>
                 {% endif %}
             </div>
-        </div>
-    </div>
+        </section>
+        
+        <!-- أفكار ذات صلة -->
+        {% if related_ideas %}
+        <section class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title mb-4 d-flex align-items-center">
+                    <i class="bi bi-lightbulb-fill ms-2 text-primary"></i>
+                    أفكار ذات صلة
+                </h2>
+                <div class="row">
+                    {% for related_idea in related_ideas %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
+                                <h3 class="card-title h5">
+                                    <a href="{{ url_for('view_idea', idea_id=related_idea.id, slug=related_idea.get_slug()) }}" class="text-decoration-none">
+                                        {{ related_idea.title }}
+                                    </a>
+                                </h3>
+                                <p class="card-text text-muted small">
+                                    {{ related_idea.description[:100] }}{% if related_idea.description|length > 100 %}...{% endif %}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-eye ms-1"></i>{{ related_idea.views }} مشاهدة
+                                    </small>
+                                    <a href="{{ url_for('view_idea', idea_id=related_idea.id, slug=related_idea.get_slug()) }}" class="btn btn-sm btn-outline-primary">
+                                        اقرأ المزيد
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+        
+        <!-- روابط سريعة -->
+        <nav class="card justify-content-center" aria-label="روابط سريعة">
+            <div class="card-body">
+                <h2 class="card-title mb-3 h5">استكشف المزيد</h2>
+                <div class="row g-2">
+                    <div class="col-6 col-md-3">
+                        <a href="{{ url_for('most_viewed') }}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-eye-fill ms-1"></i>الأكثر مشاهدة
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{{ url_for('latest_ideas') }}" class="btn btn-outline-success w-100">
+                            <i class="bi bi-clock-fill ms-1"></i>الأحدث إضافة
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{{ url_for('most_commented') }}" class="btn btn-outline-warning w-100">
+                            <i class="bi bi-chat-fill ms-1"></i>الأكثر تعليقاً
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{{ url_for('submit_idea') }}" class="btn btn-outline-info w-100">
+                            <i class="bi bi-plus-circle-fill ms-1"></i>شارك فكرتك
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
 </div>
+
+<script>
+// تحويل النص العادي الذي يحتوي على رموز bullet points إلى قوائم HTML
+document.addEventListener('DOMContentLoaded', function() {
+    const ideaContent = document.querySelector('.idea-content');
+    if (!ideaContent) return;
+    
+    // دالة لتحويل النص إلى قوائم HTML
+    function convertTextToLists(element) {
+        // الحصول على HTML الداخلي
+        let html = element.innerHTML;
+        const originalHTML = html;
+        
+        // البحث عن أنماط bullet points في النص
+        // نمط 1: "• نص" أو "•نص"
+        // نمط 2: "- نص" أو "-نص"
+        // نمط 3: "* نص" أو "*نص"
+        // نمط 4: "نص • نص" (في منتصف السطر)
+        
+        // تقسيم النص إلى أجزاء بناءً على رموز bullet points
+        // البحث عن جميع حالات "• نص" أو "- نص" أو "* نص"
+        const bulletPattern = /([\.\:،]\s*)?([•\-\*])\s*([^•\-\*<>\n]+?)(?=\s*[•\-\*]|$|\.\s|،\s)/g;
+        
+        let match;
+        const matches = [];
+        while ((match = bulletPattern.exec(html)) !== null) {
+            matches.push({
+                fullMatch: match[0],
+                prefix: match[1] || '',
+                bullet: match[2],
+                text: match[3].trim(),
+                index: match.index
+            });
+        }
+        
+        // إذا تم العثور على matches، قم بإنشاء قائمة
+        if (matches.length > 0) {
+            // تجميع matches المتتالية في قائمة واحدة
+            let processedHTML = '';
+            let lastIndex = 0;
+            let currentList = null;
+            let listItems = [];
+            
+            matches.forEach(function(match, index) {
+                // إضافة النص قبل الرمز
+                if (match.index > lastIndex) {
+                    const beforeText = html.substring(lastIndex, match.index);
+                    if (beforeText.trim()) {
+                        // إذا كان هناك قائمة مفتوحة، أغلقها أولاً
+                        if (currentList) {
+                            processedHTML += '<ul class="idea-content-list">' + listItems.join('') + '</ul>';
+                            currentList = null;
+                            listItems = [];
+                        }
+                        processedHTML += beforeText;
+                    }
+                }
+                
+                // إضافة عنصر القائمة
+                if (!currentList) {
+                    currentList = true;
+                }
+                listItems.push('<li>' + match.text + '</li>');
+                
+                lastIndex = match.index + match.fullMatch.length;
+            });
+            
+            // إضافة القائمة النهائية
+            if (currentList && listItems.length > 0) {
+                processedHTML += '<ul class="idea-content-list">' + listItems.join('') + '</ul>';
+            }
+            
+            // إضافة النص المتبقي
+            if (lastIndex < html.length) {
+                processedHTML += html.substring(lastIndex);
+            }
+            
+            // استبدال HTML فقط إذا تغير
+            if (processedHTML !== originalHTML) {
+                element.innerHTML = processedHTML;
+            }
+        }
+        
+        // معالجة إضافية: البحث عن النص الذي يحتوي على رموز bullet points في عناصر p أو div
+        const childElements = element.querySelectorAll('p, div');
+        childElements.forEach(function(child) {
+            if (child.children.length === 0) {
+                const text = child.textContent || child.innerText;
+                if (text && (text.includes('•') || text.includes(' - ') || text.match(/\s*[•\-\*]\s+/))) {
+                    convertTextToLists(child);
+                }
+            }
+        });
+    }
+    
+    // تطبيق التحويل على المحتوى
+    convertTextToLists(ideaContent);
+    
+    // معالجة إضافية: البحث عن النص العادي داخل div.idea-content مباشرة
+    const directText = ideaContent.childNodes;
+    Array.from(directText).forEach(function(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            const text = node.textContent.trim();
+            if (text && (text.includes('•') || text.match(/\s*[•\-\*]\s+/))) {
+                // إنشاء div جديد للمحتوى
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = text;
+                convertTextToLists(wrapper);
+                node.parentNode.replaceChild(wrapper, node);
+            }
+        }
+    });
+});
+
+function copyToClipboard(event, text) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    // طريقة بديلة للنسخ إذا لم تكن Clipboard API متاحة
+    const fallbackCopy = function(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            const successful = document.execCommand('copy');
+            document.body.removeChild(textArea);
+            return successful;
+        } catch (err) {
+            document.body.removeChild(textArea);
+            return false;
+        }
+    };
+    
+    // محاولة استخدام Clipboard API أولاً
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function() {
+            showCopySuccess(event);
+        }).catch(function(err) {
+            console.error('فشل نسخ الرابط:', err);
+            // محاولة الطريقة البديلة
+            if (fallbackCopy(text)) {
+                showCopySuccess(event);
+            } else {
+                showCopyError(text);
+            }
+        });
+    } else {
+        // استخدام الطريقة البديلة
+        if (fallbackCopy(text)) {
+            showCopySuccess(event);
+        } else {
+            showCopyError(text);
+        }
+    }
+}
+
+function showCopySuccess(event) {
+    const btn = event.target.closest('button');
+    if (!btn) return;
+    
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-check-circle ms-1"></i>تم النسخ!';
+    btn.classList.remove('btn-outline-secondary');
+    btn.classList.add('btn-success');
+    
+    setTimeout(function() {
+        btn.innerHTML = originalText;
+        btn.classList.remove('btn-success');
+        btn.classList.add('btn-outline-secondary');
+    }, 2000);
+}
+
+function showCopyError(text) {
+    // إنشاء input مؤقت لنسخ الرابط
+    const input = document.createElement('input');
+    input.value = text;
+    input.style.position = 'fixed';
+    input.style.opacity = '0';
+    document.body.appendChild(input);
+    input.select();
+    input.setSelectionRange(0, 99999);
+    
+    try {
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        alert('تم نسخ الرابط بنجاح!');
+    } catch (err) {
+        document.body.removeChild(input);
+        alert('فشل نسخ الرابط. يرجى نسخه يدوياً:\n' + text);
+    }
+}
+</script>
 {% endblock %} 

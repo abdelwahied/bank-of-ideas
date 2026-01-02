@@ -1,15 +1,41 @@
 {% extends "base.html" %}
 
-{% block title %}الأحدث إضافة{% endblock %}
+{% block title %}الأحدث إضافة - بنك الأفكار{% endblock %}
+
+{% block meta_description %}تابع آخر الأفكار التي تم إضافتها في بنك الأفكار. اكتشف أحدث الأفكار والابتكارات من المجتمع.{% endblock %}
+
+{% block meta_keywords %}أحدث أفكار, أفكار جديدة, آخر الأفكار, بنك الأفكار{% endblock %}
+
+{% block og_title %}الأحدث إضافة - بنك الأفكار{% endblock %}
+
+{% block og_description %}تابع آخر الأفكار التي تم إضافتها في بنك الأفكار. اكتشف أحدث الأفكار والابتكارات من المجتمع.{% endblock %}
+
+{% block og_image_alt %}الأحدث إضافة - بنك الأفكار{% endblock %}
+
+{% block twitter_title %}الأحدث إضافة - بنك الأفكار{% endblock %}
+
+{% block twitter_description %}تابع آخر الأفكار التي تم إضافتها في بنك الأفكار.{% endblock %}
+
+{% block twitter_image_alt %}الأحدث إضافة - بنك الأفكار{% endblock %}
 
 {% block content %}
 <div class="row mb-4">
     <div class="col-12">
         <h1 class="display-5 mb-3 d-flex align-items-center">
             <i class="bi bi-clock-fill text-success ms-2"></i>
-            الأحدث إضافة
+            أحدث الأفكار المضافة
         </h1>
-        <p class="lead text-muted">تابع آخر الأفكار التي تم إضافتها في المنصة</p>
+        <div class="page-description-section">
+            <p class="lead">تابع آخر الأفكار والابتكارات التي تم إضافتها في منصة بنك الأفكار. اكتشف أحدث ما يشاركه المجتمع من أفكار إبداعية ومبتكرة.</p>
+            <p>هذه الصفحة تعرض الأفكار الأحدث بناءً على تاريخ الإضافة. الأفكار الأحدث تظهر أولاً لضمان متابعة آخر التحديثات والابتكارات. في منصة بنك الأفكار، يمكنك:</p>
+            <ul>
+                <li>متابعة آخر الأفكار المضافة من قبل أعضاء المجتمع</li>
+                <li>اكتشاف أفكار جديدة ومبتكرة في مختلف المجالات</li>
+                <li>التفاعل مع الأفكار من خلال التعليقات والمناقشات</li>
+                <li>مشاركة أفكارك الخاصة مع المجتمع</li>
+            </ul>
+            <p>كل فكرة جديدة تضيف قيمة للمنصة وتساعد في بناء مجتمع من المبدعين والمبتكرين. انضم إلينا وشارك أفكارك!</p>
+        </div>
     </div>
 </div>
 
@@ -18,9 +44,9 @@
     <div class="col-md-4 mb-4">
         <div class="card h-100">
             <div class="card-body">
-                <h5 class="card-title">{{ idea.title }}</h5>
+                <h2 class="card-title h5">{{ idea.title }}</h2>
                 <h6 class="card-subtitle mb-2 text-muted">
-                    <span class="badge bg-success">{{ idea.category }}</span>
+                    <a href="{{ url_for('most_viewed') }}?category={{ idea.category }}" class="badge bg-success text-decoration-none">{{ idea.category }}</a>
                 </h6>
                 <p class="card-text">{{ idea.description[:150] }}{% if idea.description|length > 150 %}...{% endif %}</p>
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -33,9 +59,10 @@
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
                     <small class="text-muted d-flex align-items-center">
-                        <i class="bi bi-person ms-1"></i>{{ idea.author.username }}
+                        <i class="bi bi-person ms-1"></i>
+                        <a href="{{ url_for('user_profile', user_id=idea.author.id) }}" class="text-decoration-none text-muted">{{ idea.author.username }}</a>
                     </small>
-                    <a href="{{ url_for('view_idea', idea_id=idea.id) }}" class="btn btn-success btn-sm">
+                    <a href="{{ url_for('view_idea', idea_id=idea.id, slug=idea.get_slug()) }}" class="btn btn-success btn-sm">
                         اقرأ المزيد
                     </a>
                 </div>

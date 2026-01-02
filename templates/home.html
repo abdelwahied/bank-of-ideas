@@ -1,27 +1,59 @@
 {% extends "base.html" %}
 
-{% block title %}الرئيسية{% endblock %}
+{% block title %}بنك الأفكار{% endblock %}
+
+{% block meta_description %}بنك الأفكار - منصة عربية لمشاركة الأفكار الإبداعية والابتكارات. انضم إلى مجتمع المبدعين وشارك أفكارك في التكنولوجيا، التعليم، الصحة، البيئة، والخدمات الاجتماعية.{% endblock %}
+
+{% block meta_keywords %}بنك الأفكار, أفكار, مشاركة, مجتمع, تفاعل, إبداع, ابتكار, تكنولوجيا, تعليم, صحة, بيئة, اجتماعي{% endblock %}
+
+{% block og_type %}website{% endblock %}
+
+{% block og_title %}بنك الأفكار - منصة مشاركة الأفكار{% endblock %}
+
+{% block og_description %}بنك الأفكار - منصة عربية لمشاركة الأفكار الإبداعية والابتكارات. انضم إلى مجتمع المبدعين وشارك أفكارك في التكنولوجيا، التعليم، الصحة، البيئة، والخدمات الاجتماعية.{% endblock %}
+
+{% block og_image_alt %}بنك الأفكار - منصة مشاركة الأفكار{% endblock %}
+
+{% block twitter_image_alt %}بنك الأفكار - منصة مشاركة الأفكار{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "بنك الأفكار",
+  "url": "{{ request.url_root.rstrip('/') }}",
+  "description": "منصة تفاعلية لمشاركة الأفكار والتفاعل مع المجتمع",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "{{ request.url_root.rstrip('/') }}/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
-<div class="hero-section text-center mb-5 py-5" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); border-radius: 15px; color: white; padding: 4rem 2rem;">
+<div class="hero-section text-center mb-5 py-5">
     <div class="container">
-        <h1 class="display-3 mb-4 d-flex align-items-center justify-content-center">
-            <i class="bi bi-lightbulb-fill ms-3"></i>مرحباً بك في بنك الأفكار
+        <h1 class="display-3 mb-4 d-flex align-items-center justify-content-center flex-wrap">
+            <i class="bi bi-lightbulb-fill ms-3 mb-2 mb-md-0"></i><span>مرحباً بك في بنك الأفكار</span>
         </h1>
-        <p class="lead mb-4" style="font-size: 1.3rem;">منصة تفاعلية لمشاركة أفكارك والتفاعل مع أفكار الآخرين</p>
+        <p class="lead mb-4">منصة تفاعلية لمشاركة أفكارك والتفاعل مع أفكار الآخرين</p>
+        <p class="mb-0 hero-description">منصة عربية شاملة تجمع المبدعين والمبتكرين لمشاركة أفكارهم في مجالات متنوعة مثل التكنولوجيا، التعليم، الصحة، البيئة، والخدمات الاجتماعية. انضم إلى مجتمعنا وابدأ بمشاركة أفكارك اليوم!</p>
         {% if not current_user.is_authenticated %}
-        <div class="mt-4">
-            <a href="{{ url_for('register') }}" class="btn btn-light btn-lg ms-3 d-inline-flex align-items-center">
+        <div class="mt-4 d-flex justify-content-center align-items-center gap-3">
+            <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">
                 <i class="bi bi-person-plus-fill ms-2"></i>إنشاء حساب
             </a>
-            <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg d-inline-flex align-items-center">
+            <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
                 <i class="bi bi-box-arrow-in-right ms-2"></i>تسجيل الدخول
             </a>
         </div>
         {% else %}
         <div class="mt-4">
-            <a href="{{ url_for('submit_idea') }}" class="btn btn-light btn-lg d-inline-flex align-items-center">
+            <a href="{{ url_for('submit_idea') }}" class="btn btn-light btn-lg">
                 <i class="bi bi-plus-circle-fill ms-2"></i>شارك فكرتك الآن
             </a>
         </div>
@@ -34,12 +66,12 @@
     <div class="col-md-4 mb-4">
         <div class="card h-100 text-center border-0 shadow-sm">
             <div class="card-body p-4">
-                <div class="mb-3" style="font-size: 3rem; color: #3498db;">
+                <div class="mb-3 icon-large icon-primary">
                     <i class="bi bi-eye-fill"></i>
                 </div>
                 <h3 class="card-title">الأكثر مشاهدة</h3>
-                <p class="card-text text-muted">اكتشف الأفكار الأكثر شعبية والمشاهدات</p>
-                <a href="{{ url_for('most_viewed') }}" class="btn btn-primary d-inline-flex align-items-center">
+                <p class="card-text text-muted">اكتشف الأفكار الأكثر شعبية والمشاهدات في منصة بنك الأفكار. تصفح الأفكار التي حظيت بأكبر عدد من المشاهدات والاهتمام.</p>
+                <a href="{{ url_for('most_viewed') }}" class="btn btn-primary">
                     <i class="bi bi-arrow-left ms-2"></i>استعرض
                 </a>
             </div>
@@ -48,12 +80,12 @@
     <div class="col-md-4 mb-4">
         <div class="card h-100 text-center border-0 shadow-sm">
             <div class="card-body p-4">
-                <div class="mb-3" style="font-size: 3rem; color: #27ae60;">
+                <div class="mb-3 icon-large icon-success">
                     <i class="bi bi-clock-fill"></i>
                 </div>
                 <h3 class="card-title">الأحدث إضافة</h3>
-                <p class="card-text text-muted">تابع آخر الأفكار التي تم إضافتها</p>
-                <a href="{{ url_for('latest_ideas') }}" class="btn btn-success d-inline-flex align-items-center">
+                <p class="card-text text-muted">تابع آخر الأفكار والابتكارات التي تم إضافتها في منصة بنك الأفكار. اكتشف أحدث ما يشاركه المجتمع من أفكار إبداعية.</p>
+                <a href="{{ url_for('latest_ideas') }}" class="btn btn-success">
                     <i class="bi bi-arrow-left ms-2"></i>استعرض
                 </a>
             </div>
@@ -62,12 +94,12 @@
     <div class="col-md-4 mb-4">
         <div class="card h-100 text-center border-0 shadow-sm">
             <div class="card-body p-4">
-                <div class="mb-3" style="font-size: 3rem; color: #f39c12;">
+                <div class="mb-3 icon-large icon-warning">
                     <i class="bi bi-chat-fill"></i>
                 </div>
                 <h3 class="card-title">الأكثر تعليقاً</h3>
-                <p class="card-text text-muted">شاهد الأفكار الأكثر تفاعلاً</p>
-                <a href="{{ url_for('most_commented') }}" class="btn btn-warning d-inline-flex align-items-center">
+                <p class="card-text text-muted">شاهد الأفكار الأكثر تفاعلاً وتعليقاً في منصة بنك الأفكار. اكتشف الأفكار التي تثير النقاش والتفاعل بين الأعضاء.</p>
+                <a href="{{ url_for('most_commented') }}" class="btn btn-warning">
                     <i class="bi bi-arrow-left ms-2"></i>استعرض
                 </a>
             </div>
@@ -149,7 +181,7 @@
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <div class="text-center">
-                            <div class="mb-3" style="font-size: 2.5rem; color: #3498db;">
+                            <div class="mb-3 icon-medium icon-primary">
                                 <i class="bi bi-person-plus-fill"></i>
                             </div>
                             <h5>1. إنشاء حساب</h5>
@@ -158,7 +190,7 @@
                     </div>
                     <div class="col-md-4 mb-3">
                         <div class="text-center">
-                            <div class="mb-3" style="font-size: 2.5rem; color: #27ae60;">
+                            <div class="mb-3 icon-medium icon-success">
                                 <i class="bi bi-lightbulb-fill"></i>
                             </div>
                             <h5>2. شارك فكرتك</h5>
@@ -167,7 +199,7 @@
                     </div>
                     <div class="col-md-4 mb-3">
                         <div class="text-center">
-                            <div class="mb-3" style="font-size: 2.5rem; color: #f39c12;">
+                            <div class="mb-3 icon-medium icon-warning">
                                 <i class="bi bi-chat-left-text-fill"></i>
                             </div>
                             <h5>3. تفاعل</h5>

@@ -18,14 +18,18 @@
                     <div class="mb-4 text-center">
                         {% if user.profile_picture %}
                         <img src="{{ url_for('uploaded_file', filename=user.profile_picture) }}" 
-                             alt="{{ user.username }}" 
+                             alt="صورة بروفايل {{ user.username }}" 
+                             title="{{ user.full_name or user.username }}"
                              class="rounded-circle mb-3" 
                              id="preview-image"
-                             style="width: 150px; height: 150px; object-fit: cover; border: 4px solid #3498db;">
+                             width="150"
+                             height="150"
+                             loading="eager"
+                             class="profile-picture"
                         {% else %}
                         <div class="rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" 
                              id="preview-placeholder"
-                             style="width: 150px; height: 150px; background: linear-gradient(135deg, #2c3e50, #3498db); color: white; font-size: 3rem;">
+                             class="profile-picture-placeholder">
                             {{ user.username[0].upper() }}
                         </div>
                         {% endif %}

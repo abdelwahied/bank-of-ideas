@@ -12,38 +12,38 @@
 </div>
 
 <!-- بطاقات الإحصائيات الرئيسية -->
-<div class="row mb-4">
-    <div class="col-md-3 mb-3">
-        <div class="card text-center" style="background: linear-gradient(135deg, #4A90E2, #5BA3F5); color: white;">
+<div class="row mb-4 g-3">
+    <div class="col-md-3">
+        <div class="card text-center card-gradient-primary">
             <div class="card-body">
-                <i class="bi bi-people-fill" style="font-size: 2.5rem;"></i>
+                <i class="bi bi-people-fill icon-large"></i>
                 <h3 class="mt-2">{{ total_users }}</h3>
                 <p class="mb-0">إجمالي المستخدمين</p>
             </div>
         </div>
     </div>
-    <div class="col-md-3 mb-3">
-        <div class="card text-center" style="background: linear-gradient(135deg, #FFB84D, #FFC966); color: white;">
+    <div class="col-md-3">
+        <div class="card text-center card-gradient-warning">
             <div class="card-body">
-                <i class="bi bi-lightbulb-fill" style="font-size: 2.5rem;"></i>
+                <i class="bi bi-lightbulb-fill icon-large"></i>
                 <h3 class="mt-2">{{ total_ideas }}</h3>
                 <p class="mb-0">إجمالي الأفكار</p>
             </div>
         </div>
     </div>
-    <div class="col-md-3 mb-3">
-        <div class="card text-center" style="background: linear-gradient(135deg, #4ECDC4, #6BCB77); color: white;">
+    <div class="col-md-3">
+        <div class="card text-center card-gradient-success">
             <div class="card-body">
-                <i class="bi bi-chat-dots-fill" style="font-size: 2.5rem;"></i>
+                <i class="bi bi-chat-dots-fill icon-large"></i>
                 <h3 class="mt-2">{{ total_comments }}</h3>
                 <p class="mb-0">إجمالي التعليقات</p>
             </div>
         </div>
     </div>
-    <div class="col-md-3 mb-3">
-        <div class="card text-center" style="background: linear-gradient(135deg, #6BCB77, #4ECDC4); color: white;">
+    <div class="col-md-3">
+        <div class="card text-center card-gradient-info">
             <div class="card-body">
-                <i class="bi bi-eye-fill" style="font-size: 2.5rem;"></i>
+                <i class="bi bi-eye-fill icon-large"></i>
                 <h3 class="mt-2">{{ total_visits }}</h3>
                 <p class="mb-0">إجمالي الزيارات</p>
             </div>
@@ -52,29 +52,29 @@
 </div>
 
 <!-- إحصائيات الزيارات -->
-<div class="row mb-4">
-    <div class="col-md-4 mb-3">
+<div class="row mb-4 g-3">
+    <div class="col-md-4">
         <div class="card">
             <div class="card-body text-center">
-                <i class="bi bi-calendar-day text-primary" style="font-size: 2rem;"></i>
+                <i class="bi bi-calendar-day text-primary icon-medium"></i>
                 <h4 class="mt-2">{{ visits_today }}</h4>
                 <p class="text-muted mb-0">زيارات اليوم</p>
             </div>
         </div>
     </div>
-    <div class="col-md-4 mb-3">
+    <div class="col-md-4">
         <div class="card">
             <div class="card-body text-center">
-                <i class="bi bi-calendar-week text-primary" style="font-size: 2rem;"></i>
+                <i class="bi bi-calendar-week text-primary icon-medium"></i>
                 <h4 class="mt-2">{{ visits_this_week }}</h4>
                 <p class="text-muted mb-0">زيارات هذا الأسبوع</p>
             </div>
         </div>
     </div>
-    <div class="col-md-4 mb-3">
+    <div class="col-md-4">
         <div class="card">
             <div class="card-body text-center">
-                <i class="bi bi-calendar-month text-primary" style="font-size: 2rem;"></i>
+                <i class="bi bi-calendar-month text-primary icon-medium"></i>
                 <h4 class="mt-2">{{ visits_this_month }}</h4>
                 <p class="text-muted mb-0">زيارات هذا الشهر</p>
             </div>
@@ -82,9 +82,9 @@
     </div>
 </div>
 
-<div class="row mb-4">
+<div class="row mb-4 g-3">
     <!-- إحصائيات المتصفحات -->
-    <div class="col-md-6 mb-3">
+    <div class="col-md-6">
         <div class="card">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0 d-flex align-items-center">
@@ -119,7 +119,7 @@
     </div>
 
     <!-- إحصائيات الأجهزة -->
-    <div class="col-md-6 mb-3">
+    <div class="col-md-6">
         <div class="card">
             <div class="card-header bg-success text-white">
                 <h5 class="mb-0 d-flex align-items-center">
@@ -164,9 +164,9 @@
     </div>
 </div>
 
-<div class="row mb-4">
+<div class="row mb-4 g-3">
     <!-- أكثر الصفحات زيارة -->
-    <div class="col-md-6 mb-3">
+    <div class="col-md-6">
         <div class="card">
             <div class="card-header bg-warning text-dark">
                 <h5 class="mb-0 d-flex align-items-center">
@@ -203,7 +203,7 @@
     </div>
 
     <!-- إحصائيات إضافية -->
-    <div class="col-md-6 mb-3">
+    <div class="col-md-6">
         <div class="card">
             <div class="card-header bg-info text-white">
                 <h5 class="mb-0 d-flex align-items-center">
@@ -231,7 +231,7 @@
 <!-- آخر الزيارات -->
 <div class="row">
     <div class="col-12">
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 d-flex align-items-center">
                     <i class="bi bi-clock-history ms-2"></i>الزيارات
@@ -350,6 +350,233 @@
     </div>
 </div>
 
+<!-- إحصائيات SEO -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header core-web-vitals-header">
+                <h5 class="mb-0 d-flex align-items-center">
+                    <i class="bi bi-graph-up-arrow ms-2"></i>إحصائيات SEO
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- بطاقات إحصائيات SEO الرئيسية -->
+                <div class="row align-items-start g-3">
+    <div class="col-md-3">
+        <div class="vital-card seo-vital-card seo-vital-primary">
+            <div class="vital-icon-wrapper mb-3">
+                <i class="bi bi-search icon-medium"></i>
+            </div>
+            <h4 class="vital-value mb-2">{{ organic_visits }}</h4>
+            <p class="vital-name mb-1">الزيارات العضوية</p>
+            <p class="text-muted small mb-2">{{ organic_visits_month }} هذا الشهر</p>
+            <span class="badge vital-status bg-primary">{{ "%.1f"|format(organic_percentage) }}%</span>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="vital-card seo-vital-card seo-vital-success">
+            <div class="vital-icon-wrapper mb-3">
+                <i class="bi bi-file-earmark-text icon-medium"></i>
+            </div>
+            <h4 class="vital-value mb-2">{{ indexed_pages }}</h4>
+            <p class="vital-name mb-1">الصفحات المفهرسة</p>
+            <p class="text-muted small mb-2">{{ total_ideas }} فكرة + 4 صفحات ثابتة</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="vital-card seo-vital-card seo-vital-warning">
+            <div class="vital-icon-wrapper mb-3">
+                <i class="bi bi-cursor-click icon-medium"></i>
+            </div>
+            <h4 class="vital-value mb-2">{{ "%.1f"|format(ctr) }}%</h4>
+            <p class="vital-name mb-1">معدل النقر (CTR)</p>
+            <span class="badge vital-status bg-{{ 'success' if ctr >= 20 else 'warning' if ctr >= 14 else 'danger' }}">{{ ctr_status }}</span>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="vital-card seo-vital-card seo-vital-info">
+            <div class="vital-icon-wrapper mb-3">
+                <i class="bi bi-arrow-left-right icon-medium"></i>
+            </div>
+            <h4 class="vital-value mb-2">{{ "%.1f"|format(bounce_rate) }}%</h4>
+            <p class="vital-name mb-1">معدل الارتداد</p>
+            <span class="badge vital-status bg-{{ 'success' if bounce_rate < 40 else 'warning' if bounce_rate < 60 else 'danger' }}">{{ bounce_rate_status }}</span>
+        </div>
+    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Core Web Vitals -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header core-web-vitals-header">
+                <h5 class="mb-0 d-flex align-items-center">
+                    <i class="bi bi-speedometer2 ms-2"></i>Core Web Vitals
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-start g-3">
+                    <div class="col-md-4">
+                        <div class="vital-card vital-card-lcp">
+                            <div class="vital-icon-wrapper mb-3">
+                                <i class="bi bi-clock-history icon-medium"></i>
+                            </div>
+                            <h4 class="vital-value mb-2">{{ "%.2f"|format(estimated_lcp) }}s</h4>
+                            <p class="vital-name mb-1"><strong>LCP</strong></p>
+                            <p class="text-muted small mb-2">Largest Contentful Paint</p>
+                            <span class="badge vital-status bg-{{ 'success' if estimated_lcp < 2.5 else 'warning' }}">{{ lcp_status }}</span>
+                            <small class="d-block text-muted mt-2">الهدف: &lt; 2.5s</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="vital-card vital-card-fid">
+                            <div class="vital-icon-wrapper mb-3">
+                                <i class="bi bi-lightning-charge icon-medium"></i>
+                            </div>
+                            <h4 class="vital-value mb-2">{{ estimated_fid }}ms</h4>
+                            <p class="vital-name mb-1"><strong>FID</strong></p>
+                            <p class="text-muted small mb-2">First Input Delay</p>
+                            <span class="badge vital-status bg-{{ 'success' if estimated_fid < 100 else 'warning' }}">{{ fid_status }}</span>
+                            <small class="d-block text-muted mt-2">الهدف: &lt; 100ms</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="vital-card vital-card-cls">
+                            <div class="vital-icon-wrapper mb-3">
+                                <i class="bi bi-arrows-move icon-medium"></i>
+                            </div>
+                            <h4 class="vital-value mb-2">{{ "%.2f"|format(estimated_cls) }}</h4>
+                            <p class="vital-name mb-1"><strong>CLS</strong></p>
+                            <p class="text-muted small mb-2">Cumulative Layout Shift</p>
+                            <span class="badge vital-status bg-{{ 'success' if estimated_cls < 0.1 else 'warning' }}">{{ cls_status }}</span>
+                            <small class="d-block text-muted mt-2">الهدف: &lt; 0.1</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- إحصائيات إضافية -->
+<div class="row mb-4 g-3 align-items-stretch">
+    <div class="col-md-6 d-flex">
+        <div class="card w-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0 d-flex align-items-center">
+                    <i class="bi bi-pie-chart-fill ms-2"></i>مصادر الزيارات
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span><i class="bi bi-search text-primary ms-1"></i>عضوية (محركات البحث)</span>
+                        <strong>{{ "%.1f"|format(organic_percentage) }}%</strong>
+                    </div>
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ organic_percentage }}%">
+                            {{ organic_visits }}
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span><i class="bi bi-link-45deg text-success ms-1"></i>مباشرة (Direct)</span>
+                        <strong>{{ "%.1f"|format(direct_percentage) }}%</strong>
+                    </div>
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ direct_percentage }}%">
+                            {{ direct_visits if direct_visits else 0 }}
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span><i class="bi bi-share text-warning ms-1"></i>روابط خارجية (Referral)</span>
+                        <strong>{{ "%.1f"|format(referral_percentage) }}%</strong>
+                    </div>
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: {{ referral_percentage }}%">
+                            {{ referral_visits if referral_visits else 0 }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 d-flex">
+        <div class="card w-100">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0 d-flex align-items-center">
+                    <i class="bi bi-graph-up ms-2"></i>مقاييس الأداء
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-people-fill text-primary ms-1"></i>معدل التحويل</span>
+                        <strong>{{ "%.2f"|format(conversion_rate) }}%</strong>
+                    </div>
+                    <small class="text-muted">نسبة الزوار الذين أصبحوا مستخدمين</small>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-clock text-success ms-1"></i>متوسط مدة الجلسة</span>
+                        <strong>{{ "%.1f"|format(avg_session_duration) }} دقيقة</strong>
+                    </div>
+                    <small class="text-muted">تقدير بناءً على عدد الصفحات</small>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-file-earmark-text text-info ms-1"></i>متوسط الصفحات/جلسة</span>
+                        <strong>{{ "%.1f"|format(avg_pages_per_session) }}</strong>
+                    </div>
+                    <small class="text-muted">عدد الصفحات لكل زائر</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- الصفحات الأكثر شعبية من محركات البحث -->
+{% if organic_popular_pages %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0 d-flex align-items-center">
+                    <i class="bi bi-star-fill ms-2"></i>الصفحات الأكثر شعبية من محركات البحث
+                </h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>الصفحة</th>
+                            <th class="text-center">الزيارات العضوية</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for page, count in organic_popular_pages %}
+                        <tr>
+                            <td><code>{{ page }}</code></td>
+                            <td class="text-center">
+                                <span class="badge bg-primary">{{ count }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- روابط سريعة -->
 <div class="row mt-4">
     <div class="col-12">
@@ -365,6 +592,12 @@
                 </a>
                 <a href="{{ url_for('home') }}" class="btn btn-secondary me-2 mb-2">
                     <i class="bi bi-house-fill ms-1"></i>الصفحة الرئيسية
+                </a>
+                <a href="{{ url_for('sitemap') }}" class="btn btn-success me-2 mb-2" target="_blank">
+                    <i class="bi bi-sitemap ms-1"></i>عرض Sitemap
+                </a>
+                <a href="{{ url_for('robots') }}" class="btn btn-info me-2 mb-2" target="_blank">
+                    <i class="bi bi-robot ms-1"></i>عرض Robots.txt
                 </a>
             </div>
         </div>

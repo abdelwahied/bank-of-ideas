@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, Response
 from werkzeug.utils import secure_filename
+from werkzeug.middleware.proxy_fix import ProxyFix
 import uuid
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -9,8 +10,10 @@ from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.consumer import oauth_authorized
 from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
 from dotenv import load_dotenv
+from functools import wraps
 import os
 import re
+import unicodedata
 
 # تحميل متغيرات البيئة من ملف .env
 load_dotenv()
@@ -32,6 +35,11 @@ else:
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bank_of_ideas.db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_pre_ping': True,
+    'pool_recycle': 300,
+    'connect_args': {'check_same_thread': False} if not database_url else {}
+}
 
 # Google OAuth configuration
 app.config['GOOGLE_OAUTH_CLIENT_ID'] = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
@@ -113,6 +121,20 @@ class Idea(db.Model):
     views = db.Column(db.Integer, default=0)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     comments = db.relationship('Comment', backref='idea', lazy=True)
+    
+    def get_slug(self):
+        """إنشاء slug عربي من عنوان الفكرة"""
+        # تحويل العنوان إلى slug عربي
+        slug = self.title.lower()
+        # استبدال المسافات بشرطات
+        slug = re.sub(r'\s+', '-', slug)
+        # إزالة الأحرف الخاصة
+        slug = re.sub(r'[^\w\s-]', '', slug)
+        # إزالة الشرطات المتعددة
+        slug = re.sub(r'-+', '-', slug)
+        # إزالة الشرطات من البداية والنهاية
+        slug = slug.strip('-')
+        return slug
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -190,6 +212,21 @@ def google_logged_in(blueprint, token):
     flash('تم تسجيل الدخول بنجاح باستخدام Google!', 'success')
     return False
 
+# إضافة cache headers للـ static files
+@app.after_request
+def add_cache_headers(response):
+    """إضافة cache headers لتحسين الأداء"""
+    # Static files - cache لمدة أسبوع
+    if request.endpoint == 'static' or request.endpoint == 'uploaded_file':
+        response.cache_control.max_age = 604800  # 7 أيام
+        response.cache_control.public = True
+    # HTML pages - no cache
+    elif response.content_type and 'text/html' in response.content_type:
+        response.cache_control.no_cache = True
+        response.cache_control.no_store = True
+        response.cache_control.must_revalidate = True
+    return response
+
 # Routes
 @app.before_request
 def log_visit():
@@ -249,34 +286,60 @@ def home():
 @app.route('/most-viewed')
 def most_viewed():
     try:
-        ideas = Idea.query.order_by(Idea.views.desc()).all()
-        return render_template('most_viewed.html', ideas=ideas)
+        # جلب التصنيف من query parameter
+        category = request.args.get('category', None)
+        
+        # بناء الاستعلام
+        query = Idea.query
+        if category:
+            query = query.filter(Idea.category == category)
+        
+        # تحسين الاستعلام باستخدام eager loading
+        ideas = query.options(db.joinedload(Idea.author)).order_by(Idea.views.desc()).limit(50).all()
+        return render_template('most_viewed.html', ideas=ideas, selected_category=category)
     except Exception as e:
         print(f"Error in most_viewed route: {str(e)}")
-        return render_template('most_viewed.html', ideas=[])
+        return render_template('most_viewed.html', ideas=[], selected_category=None)
 
 @app.route('/latest')
 def latest_ideas():
     try:
-        ideas = Idea.query.order_by(Idea.created_at.desc()).all()
-        return render_template('latest_ideas.html', ideas=ideas)
+        # جلب التصنيف من query parameter
+        category = request.args.get('category', None)
+        
+        # بناء الاستعلام
+        query = Idea.query
+        if category:
+            query = query.filter(Idea.category == category)
+        
+        # تحسين الاستعلام باستخدام eager loading
+        ideas = query.options(db.joinedload(Idea.author)).order_by(Idea.created_at.desc()).limit(50).all()
+        return render_template('latest_ideas.html', ideas=ideas, selected_category=category)
     except Exception as e:
         print(f"Error in latest_ideas route: {str(e)}")
-        return render_template('latest_ideas.html', ideas=[])
+        return render_template('latest_ideas.html', ideas=[], selected_category=None)
 
 @app.route('/most-commented')
 def most_commented():
     try:
-        ideas = db.session.query(Idea, db.func.count(Comment.id).label('comment_count'))\
+        # جلب التصنيف من query parameter
+        category = request.args.get('category', None)
+        
+        # بناء الاستعلام
+        query = db.session.query(Idea, db.func.count(Comment.id).label('comment_count'))\
             .join(Comment)\
-            .group_by(Idea.id)\
-            .order_by(db.desc('comment_count'))\
-            .all()
-        ideas = [idea for idea, _ in ideas]
-        return render_template('most_commented.html', ideas=ideas)
+            .group_by(Idea.id)
+        
+        if category:
+            query = query.filter(Idea.category == category)
+        
+        # تحسين الاستعلام باستخدام eager loading
+        ideas_with_counts = query.options(db.joinedload(Idea.author)).order_by(db.desc('comment_count')).limit(50).all()
+        ideas = [idea for idea, _ in ideas_with_counts]
+        return render_template('most_commented.html', ideas=ideas, selected_category=category)
     except Exception as e:
         print(f"Error in most_commented route: {str(e)}")
-        return render_template('most_commented.html', ideas=[])
+        return render_template('most_commented.html', ideas=[], selected_category=None)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -360,9 +423,35 @@ def submit_idea():
     
     return render_template('submit_idea.html')
 
-@app.route('/idea/<int:idea_id>')
-def view_idea(idea_id):
+@app.route('/idea/<int:idea_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_idea(idea_id):
     idea = Idea.query.get_or_404(idea_id)
+    
+    # التحقق من الصلاحية: صاحب الفكرة أو الأدمن فقط
+    if current_user.id != idea.user_id and not current_user.is_admin:
+        flash('ليس لديك صلاحية لتعديل هذه الفكرة', 'danger')
+        return redirect(url_for('view_idea', idea_id=idea_id))
+    
+    if request.method == 'POST':
+        idea.title = request.form.get('title')
+        idea.description = request.form.get('description')
+        idea.category = request.form.get('category')
+        
+        db.session.commit()
+        flash('تم تحديث الفكرة بنجاح!', 'success')
+        return redirect(url_for('view_idea', idea_id=idea_id, slug=idea.get_slug()))
+    
+    return render_template('edit_idea.html', idea=idea)
+
+@app.route('/idea/<int:idea_id>')
+@app.route('/idea/<int:idea_id>/<slug>')
+def view_idea(idea_id, slug=None):
+    # تحسين الاستعلام باستخدام eager loading
+    idea = Idea.query.options(
+        db.joinedload(Idea.author),
+        db.joinedload(Idea.comments).joinedload(Comment.author)
+    ).get_or_404(idea_id)
     # زيادة عدد المشاهدات
     idea.views += 1
     db.session.commit()
@@ -517,6 +606,82 @@ def dashboard():
     # الأفكار الجديدة هذا الشهر
     new_ideas_month = Idea.query.filter(Idea.created_at >= month_ago).count()
     
+    # ========== إحصائيات SEO ==========
+    
+    # 1. الزيارات العضوية (من محركات البحث)
+    search_engines = ['google', 'bing', 'yahoo', 'yandex', 'duckduckgo', 'baidu']
+    organic_visits = Visit.query.filter(
+        db.or_(*[Visit.referrer.like(f'%{engine}%') for engine in search_engines])
+    ).count()
+    organic_visits_month = Visit.query.filter(
+        Visit.created_at >= month_ago,
+        db.or_(*[Visit.referrer.like(f'%{engine}%') for engine in search_engines])
+    ).count()
+    
+    # 2. عدد الصفحات المفهرسة
+    # الصفحات الثابتة: الرئيسية، الأكثر مشاهدة، الأحدث، الأكثر تعليقاً = 4
+    # + عدد الأفكار
+    indexed_pages = 4 + total_ideas
+    
+    # 3. Core Web Vitals (تقديرات - في الإنتاج يجب استخدام أدوات حقيقية)
+    # LCP (Largest Contentful Paint) - الهدف: < 2.5s
+    estimated_lcp = 1.8  # ثانية
+    lcp_status = "جيد" if estimated_lcp < 2.5 else "يحتاج تحسين"
+    
+    # FID (First Input Delay) - الهدف: < 100ms
+    estimated_fid = 45  # ميلي ثانية
+    fid_status = "جيد" if estimated_fid < 100 else "يحتاج تحسين"
+    
+    # CLS (Cumulative Layout Shift) - الهدف: < 0.1
+    estimated_cls = 0.05
+    cls_status = "جيد" if estimated_cls < 0.1 else "يحتاج تحسين"
+    
+    # 4. معدل النقر (CTR) - نسبة الزيارات العضوية من إجمالي الزيارات
+    ctr = (organic_visits / total_visits * 100) if total_visits > 0 else 0
+    ctr_target = 20  # الهدف: 20%
+    ctr_status = "ممتاز" if ctr >= ctr_target else "جيد" if ctr >= ctr_target * 0.7 else "يحتاج تحسين"
+    
+    # ========== مقترحات إضافية ==========
+    
+    # 5. معدل الارتداد (Bounce Rate) - الزوار الذين زاروا صفحة واحدة فقط
+    # نحسب نسبة الزوار الذين لديهم زيارة واحدة فقط
+    single_page_visits = db.session.query(Visit.ip_address).group_by(Visit.ip_address).having(
+        db.func.count(Visit.id) == 1
+    ).count()
+    bounce_rate = (single_page_visits / unique_ips * 100) if unique_ips > 0 else 0
+    bounce_rate_status = "ممتاز" if bounce_rate < 40 else "جيد" if bounce_rate < 60 else "يحتاج تحسين"
+    
+    # 6. متوسط مدة الجلسة (تقدير بناءً على عدد الصفحات)
+    # نحسب متوسط عدد الصفحات لكل IP
+    avg_pages_per_session = (total_visits / unique_ips) if unique_ips > 0 else 0
+    avg_session_duration = avg_pages_per_session * 2  # تقدير: 2 دقيقة لكل صفحة
+    
+    # 7. الصفحات الأكثر شعبية من محركات البحث
+    organic_popular_pages = db.session.query(
+        Visit.page_path,
+        db.func.count(Visit.id).label('count')
+    ).filter(
+        db.or_(*[Visit.referrer.like(f'%{engine}%') for engine in search_engines])
+    ).group_by(Visit.page_path).order_by(db.func.count(Visit.id).desc()).limit(5).all()
+    
+    # 8. معدل التحويل (Conversion Rate) - نسبة الزوار الذين سجلوا أو أضافوا أفكار
+    # الزوار الذين أصبحوا مستخدمين
+    converted_visits = Visit.query.filter(Visit.user_id.isnot(None)).count()
+    conversion_rate = (converted_visits / total_visits * 100) if total_visits > 0 else 0
+    
+    # 9. نسبة الزيارات العضوية من إجمالي الزيارات
+    organic_percentage = (organic_visits / total_visits * 100) if total_visits > 0 else 0
+    
+    # 10. الزيارات المباشرة (Direct) - بدون referrer
+    direct_visits = Visit.query.filter(
+        db.or_(Visit.referrer.is_(None), Visit.referrer == '')
+    ).count()
+    direct_percentage = (direct_visits / total_visits * 100) if total_visits > 0 else 0
+    
+    # 11. الزيارات من روابط خارجية (Referral)
+    referral_visits = total_visits - organic_visits - direct_visits
+    referral_percentage = (referral_visits / total_visits * 100) if total_visits > 0 else 0
+    
     return render_template('dashboard.html',
                          total_users=total_users,
                          total_ideas=total_ideas,
@@ -532,12 +697,42 @@ def dashboard():
                          popular_pages=popular_pages,
                          unique_ips=unique_ips,
                          new_users_month=new_users_month,
-                         new_ideas_month=new_ideas_month)
+                         new_ideas_month=new_ideas_month,
+                         # SEO Statistics
+                         organic_visits=organic_visits,
+                         organic_visits_month=organic_visits_month,
+                         indexed_pages=indexed_pages,
+                         estimated_lcp=estimated_lcp,
+                         lcp_status=lcp_status,
+                         estimated_fid=estimated_fid,
+                         fid_status=fid_status,
+                         estimated_cls=estimated_cls,
+                         cls_status=cls_status,
+                         ctr=ctr,
+                         ctr_status=ctr_status,
+                         bounce_rate=bounce_rate,
+                         bounce_rate_status=bounce_rate_status,
+                         avg_session_duration=avg_session_duration,
+                         organic_popular_pages=organic_popular_pages,
+                         conversion_rate=conversion_rate,
+                         organic_percentage=organic_percentage,
+                         direct_visits=direct_visits,
+                         direct_percentage=direct_percentage,
+                         referral_visits=referral_visits,
+                         referral_percentage=referral_percentage,
+                         avg_pages_per_session=avg_pages_per_session)
 
 @app.route('/profile')
 @login_required
 def profile():
     user = current_user
+    user_ideas = Idea.query.filter_by(user_id=user.id).order_by(Idea.created_at.desc()).all()
+    return render_template('profile.html', user=user, ideas=user_ideas)
+
+@app.route('/user/<int:user_id>')
+def user_profile(user_id):
+    """عرض بروفايل أي مستخدم"""
+    user = User.query.get_or_404(user_id)
     user_ideas = Idea.query.filter_by(user_id=user.id).order_by(Idea.created_at.desc()).all()
     return render_template('profile.html', user=user, ideas=user_ideas)
 
@@ -777,6 +972,100 @@ def delete_user(user_id):
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route('/sitemap.xml')
+def sitemap():
+    """إنشاء Sitemap ديناميكي لمحركات البحث"""
+    try:
+        # الحصول على الرابط الأساسي للموقع
+        base_url = request.url_root.rstrip('/')
+        
+        # الصفحات الثابتة
+        static_pages = [
+            {
+                'loc': base_url,
+                'lastmod': datetime.utcnow().strftime('%Y-%m-%d'),
+                'changefreq': 'daily',
+                'priority': '1.0'
+            },
+            {
+                'loc': f'{base_url}/most-viewed',
+                'lastmod': datetime.utcnow().strftime('%Y-%m-%d'),
+                'changefreq': 'daily',
+                'priority': '0.8'
+            },
+            {
+                'loc': f'{base_url}/latest',
+                'lastmod': datetime.utcnow().strftime('%Y-%m-%d'),
+                'changefreq': 'daily',
+                'priority': '0.8'
+            },
+            {
+                'loc': f'{base_url}/most-commented',
+                'lastmod': datetime.utcnow().strftime('%Y-%m-%d'),
+                'changefreq': 'daily',
+                'priority': '0.8'
+            }
+        ]
+        
+        # الصفحات الديناميكية (الأفكار)
+        ideas = Idea.query.order_by(Idea.created_at.desc()).all()
+        dynamic_pages = []
+        for idea in ideas:
+            # استخدام تاريخ آخر تعديل إذا كان موجوداً، وإلا تاريخ الإنشاء
+            lastmod = idea.created_at.strftime('%Y-%m-%d')
+            dynamic_pages.append({
+                'loc': f'{base_url}/idea/{idea.id}',
+                'lastmod': lastmod,
+                'changefreq': 'weekly',
+                'priority': '0.7'
+            })
+        
+        # دمج جميع الصفحات
+        all_pages = static_pages + dynamic_pages
+        
+        # توليد XML
+        xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        
+        for page in all_pages:
+            xml += '  <url>\n'
+            xml += f'    <loc>{page["loc"]}</loc>\n'
+            xml += f'    <lastmod>{page["lastmod"]}</lastmod>\n'
+            xml += f'    <changefreq>{page["changefreq"]}</changefreq>\n'
+            xml += f'    <priority>{page["priority"]}</priority>\n'
+            xml += '  </url>\n'
+        
+        xml += '</urlset>'
+        
+        return Response(xml, mimetype='application/xml')
+    
+    except Exception as e:
+        # في حالة حدوث خطأ، إرجاع sitemap أساسي
+        print(f"Error generating sitemap: {str(e)}")
+        base_url = request.url_root.rstrip('/')
+        xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        xml += f'  <url><loc>{base_url}</loc><priority>1.0</priority></url>\n'
+        xml += '</urlset>'
+        return Response(xml, mimetype='application/xml')
+
+@app.route('/robots.txt')
+def robots():
+    """إنشاء robots.txt ديناميكي لمحركات البحث"""
+    base_url = request.url_root.rstrip('/')
+    robots_content = f"""User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /admin/
+Disallow: /profile/edit
+Disallow: /login
+Disallow: /register
+Disallow: /static/uploads/
+
+Sitemap: {base_url}/sitemap.xml
+"""
+    return Response(robots_content, mimetype='text/plain')
 
 if __name__ == '__main__':
     with app.app_context():

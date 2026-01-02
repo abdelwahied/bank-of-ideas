@@ -17,12 +17,16 @@
                         <div class="col-12 text-center">
                             {% if user.profile_picture %}
                             <img src="{{ url_for('uploaded_file', filename=user.profile_picture) }}" 
-                                 alt="{{ user.username }}" 
+                                 alt="صورة بروفايل {{ user.username }}" 
+                                 title="{{ user.full_name or user.username }}"
                                  class="rounded-circle mb-3" 
-                                 style="width: 100px; height: 100px; object-fit: cover;">
+                                 width="100"
+                                 height="100"
+                                 loading="eager"
+                                 class="profile-picture-medium"
                             {% else %}
                             <div class="rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" 
-                                 style="width: 100px; height: 100px; background: linear-gradient(135deg, #4A90E2, #5BA3F5); color: white; font-size: 2.5rem;">
+                                 class="profile-picture-placeholder-medium">
                                 {{ user.username[0].upper() }}
                             </div>
                             {% endif %}

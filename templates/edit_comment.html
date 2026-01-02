@@ -22,7 +22,7 @@
                         <textarea class="form-control" id="content" name="content" rows="5" required>{{ comment.content }}</textarea>
                     </div>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{{ url_for('view_idea', idea_id=comment.idea_id) }}" class="btn btn-secondary d-inline-flex align-items-center">
+                        <a href="{{ url_for('view_idea', idea_id=comment.idea_id, slug=comment.idea.get_slug()) }}" class="btn btn-secondary d-inline-flex align-items-center">
                             <i class="bi bi-x-circle ms-2"></i>إلغاء
                         </a>
                         <button type="submit" class="btn btn-primary d-inline-flex align-items-center">

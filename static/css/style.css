@@ -36,12 +36,26 @@ body {
     padding: 0.5rem 1rem !important;
     border-radius: 5px;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .nav-link:hover {
     color: white !important;
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255,255,255,0.15);
     transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-link.active {
+    background-color: rgba(255,255,255,0.2);
+    color: white !important;
+}
+
+.nav-link.dropdown-toggle::after {
+    margin-right: 0.5rem;
+    margin-left: 0;
 }
 
 .card {
@@ -105,10 +119,49 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0.5rem 1rem;
     border-radius: 15px;
     font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
 }
 
 .badge.bg-primary {
     background: linear-gradient(135deg, var(--primary-color), #5BA3F5) !important;
+}
+
+.badge.bg-primary:hover,
+a.badge.bg-primary:hover {
+    background: linear-gradient(135deg, #5BA3F5, #6BB0FF) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(74, 144, 226, 0.4);
+    color: white !important;
+}
+
+.badge.bg-success {
+    background: linear-gradient(135deg, var(--success-color), #7dd87f) !important;
+}
+
+.badge.bg-success:hover,
+a.badge.bg-success:hover {
+    background: linear-gradient(135deg, #7dd87f, #8EE58F) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(107, 203, 119, 0.4);
+    color: white !important;
+}
+
+.badge.bg-warning {
+    background: linear-gradient(135deg, var(--secondary-color), #FFC966) !important;
+}
+
+.badge.bg-warning:hover,
+a.badge.bg-warning:hover {
+    background: linear-gradient(135deg, #FFC966, #FFD580) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 184, 77, 0.4);
+    color: #2C3E50 !important;
+}
+
+a.badge {
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .form-control {
@@ -171,11 +224,57 @@ h1, h2, h3, h4, h5, h6 {
 .dropdown-menu {
     text-align: right;
     direction: rtl;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: none;
+    padding: 0.5rem 0;
+    margin-top: 0.5rem;
 }
 
 .dropdown-item {
     text-align: right;
     direction: rtl;
+    padding: 0.75rem 1.25rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-item:hover {
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(91, 163, 245, 0.1));
+    color: var(--primary-color);
+    transform: translateX(-3px);
+}
+
+.dropdown-item i {
+    margin-left: 0.75rem;
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+    color: var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover i {
+    color: var(--primary-color);
+    transform: scale(1.1);
+}
+
+/* تحسين أيقونات القائمة */
+.nav-link i {
+    margin-left: 0.5rem;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    width: 20px;
+    text-align: center;
+}
+
+.nav-link:hover i {
+    transform: scale(1.15);
+}
+
+.nav-link.active i {
+    color: white;
 }
 
 /* محاذاة القائمة المنسدلة من حافة الهيدر */
@@ -210,6 +309,64 @@ h1, h2, h3, h4, h5, h6 {
 
 .hero-section {
     margin-top: 2rem;
+}
+
+/* تحسين استجابة الأزرار في hero section */
+.hero-section .btn {
+    min-width: 150px;
+    white-space: nowrap;
+}
+
+/* تحسين hero section على الشاشات الصغيرة */
+@media (max-width: 576px) {
+    .hero-section {
+        padding: 1.5rem 1rem !important;
+        margin-top: 1rem;
+    }
+    
+    .hero-section h1 {
+        font-size: 1.75rem !important;
+        line-height: 1.3;
+    }
+    
+    .hero-section .lead {
+        font-size: 1rem !important;
+        padding: 0 0.5rem;
+    }
+    
+    .hero-section .btn {
+        width: 100%;
+        min-width: auto;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
+    
+    .hero-section .btn-lg {
+        font-size: 1rem;
+        padding: 0.75rem 1.25rem;
+    }
+}
+
+/* تحسين hero section على الشاشات المتوسطة */
+@media (min-width: 577px) and (max-width: 768px) {
+    .hero-section {
+        padding: 2.5rem 1.5rem !important;
+    }
+    
+    .hero-section h1 {
+        font-size: 2.25rem !important;
+    }
+    
+    .hero-section .lead {
+        font-size: 1.1rem !important;
+    }
+}
+
+/* تحسين الأزرار على جميع الشاشات */
+@media (max-width: 991px) {
+    .hero-section .d-flex.gap-3 {
+        gap: 0.75rem !important;
+    }
 }
 
 /* محاذاة الأيقونات مع النص في RTL */
@@ -257,6 +414,26 @@ h1, h2, h3, h4, h5, h6 {
 /* تحسين محاذاة الأزرار */
 .btn .bi {
     vertical-align: middle;
+}
+
+/* تحسين الصور */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+img[loading="lazy"] {
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+img[loading="lazy"].loaded {
+    opacity: 1;
+}
+
+/* تحسين صور البروفايل */
+img.rounded-circle {
+    aspect-ratio: 1 / 1;
 }
 
 /* ألوان إضافية للأزرار */
@@ -318,5 +495,1188 @@ a:hover {
 
 .text-muted {
     color: #6c757d !important;
+}
+
+/* تحسين Breadcrumb */
+.breadcrumb {
+    background: transparent;
+    padding: 0.75rem 0;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+}
+
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "/";
+    color: #6c757d;
+    padding: 0 0.75rem;
+    font-weight: 400;
+}
+
+.breadcrumb-item a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 0.25rem 0.5rem;
+    border-radius: 5px;
+}
+
+.breadcrumb-item a:hover {
+    color: white;
+    background: linear-gradient(135deg, var(--primary-color), #5BA3F5);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(74, 144, 226, 0.3);
+}
+
+.breadcrumb-item.active {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.breadcrumb-item i {
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.breadcrumb-item a:hover i {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.breadcrumb-item.active i {
+    opacity: 0.6;
+}
+
+/* تحسين منطقة الوصف في صفحات الأفكار */
+.page-description-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.page-description-section .lead {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.page-description-section p {
+    margin-bottom: 1rem;
+    line-height: 1.8;
+}
+
+.page-description-section ul {
+    margin-bottom: 1rem;
+    padding-right: 1.5rem;
+}
+
+.page-description-section ul li {
+    margin-bottom: 0.5rem;
+    line-height: 1.8;
+}
+
+.page-description-section ul li strong {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* تحسين ألوان الهوفر للأزرار */
+.btn-outline-success:hover {
+    background: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(107, 203, 119, 0.3);
+}
+
+.btn-outline-warning:hover {
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 184, 77, 0.3);
+}
+
+.btn-outline-info:hover {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(78, 205, 196, 0.3);
+}
+
+.btn-light {
+    background: white;
+    border: 2px solid #e9ecef;
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.btn-light:hover {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-outline-light {
+    border: 2px solid white;
+    color: white;
+    font-weight: 600;
+}
+
+.btn-outline-light:hover {
+    background: white;
+    color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.3);
+}
+
+/* Hero Section Styles */
+.hero-section {
+    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+    border-radius: 15px;
+    color: white;
+    padding: 2rem 1rem;
+}
+
+.hero-section .lead {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+}
+
+.hero-section .hero-description {
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+}
+
+/* Icon Styles */
+.icon-large {
+    font-size: 3rem;
+}
+
+.icon-medium {
+    font-size: 2.5rem;
+}
+
+.icon-primary {
+    color: #3498db;
+}
+
+.icon-success {
+    color: #27ae60;
+}
+
+.icon-warning {
+    color: #f39c12;
+}
+
+/* Profile Picture Styles */
+.profile-picture {
+    object-fit: cover;
+    border: 4px solid #3498db;
+}
+
+.profile-picture-placeholder {
+    width: 150px;
+    height: 150px;
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    color: white;
+    font-size: 3rem;
+    object-fit: cover;
+}
+
+.profile-picture-small {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+.profile-picture-medium {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.profile-picture-placeholder-small {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #4A90E2, #5BA3F5);
+    color: white;
+    font-weight: bold;
+    object-fit: cover;
+}
+
+.profile-picture-placeholder-medium {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #4A90E2, #5BA3F5);
+    color: white;
+    font-size: 2.5rem;
+    object-fit: cover;
+}
+
+/* Card Gradient Styles */
+.card-gradient-primary {
+    background: linear-gradient(135deg, #4A90E2, #5BA3F5);
+    color: white;
+}
+
+.card-gradient-warning {
+    background: linear-gradient(135deg, #FFB84D, #FFC966);
+    color: white;
+}
+
+.card-gradient-success {
+    background: linear-gradient(135deg, #4ECDC4, #6BCB77);
+    color: white;
+}
+
+.card-gradient-info {
+    background: linear-gradient(135deg, #6BCB77, #4ECDC4);
+    color: white;
+}
+
+/* Unified Button Styles */
+.btn {
+    border-radius: 25px;
+    font-weight: 600;
+    padding: 0.5rem 1.5rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-sm {
+    padding: 0.375rem 1rem;
+    font-size: 0.875rem;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.75rem;
+    font-size: 1.1rem;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success-color), #7dd87f);
+    border: none;
+    color: white;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #7dd87f, var(--success-color));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(107, 203, 119, 0.3);
+    color: white;
+}
+
+.btn-outline-success {
+    border-color: var(--success-color);
+    color: var(--success-color);
+}
+
+.btn-outline-success:hover {
+    background: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(107, 203, 119, 0.3);
+}
+
+.btn-outline-warning {
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
+}
+
+.btn-outline-warning:hover {
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 184, 77, 0.3);
+}
+
+.btn-outline-info {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.btn-outline-info:hover {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(78, 205, 196, 0.3);
+}
+
+/* Empty State Icon */
+.empty-state-icon {
+    font-size: 3rem;
+    color: #ccc;
+}
+
+/* تحسين بطاقات SEO */
+.seo-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.seo-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, currentColor, transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.seo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.seo-card:hover::before {
+    opacity: 1;
+}
+
+.seo-card-primary {
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.05) 0%, rgba(91, 163, 245, 0.1) 100%);
+    border-left: 4px solid var(--primary-color);
+}
+
+.seo-card .card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    flex: 1;
+}
+
+.seo-card-primary .seo-icon-wrapper {
+    background: linear-gradient(135deg, var(--primary-color), #5BA3F5);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+.seo-card-primary .seo-icon-wrapper i {
+    color: white;
+    font-size: 2.5rem;
+}
+
+.seo-card-primary .seo-value {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 2.5rem;
+}
+
+.seo-card-primary .seo-label {
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.seo-card-success {
+    background: linear-gradient(135deg, rgba(107, 203, 119, 0.05) 0%, rgba(125, 216, 127, 0.1) 100%);
+    border-left: 4px solid var(--success-color);
+}
+
+.seo-card-success .seo-icon-wrapper {
+    background: linear-gradient(135deg, var(--success-color), #7dd87f);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(107, 203, 119, 0.3);
+}
+
+.seo-card-success .seo-icon-wrapper i {
+    color: white;
+    font-size: 2.5rem;
+}
+
+.seo-card-success .seo-value {
+    color: var(--success-color);
+    font-weight: 700;
+    font-size: 2.5rem;
+}
+
+.seo-card-success .seo-label {
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.seo-card-warning {
+    background: linear-gradient(135deg, rgba(255, 184, 77, 0.05) 0%, rgba(255, 201, 102, 0.1) 100%);
+    border-left: 4px solid var(--secondary-color);
+}
+
+.seo-card-warning .seo-icon-wrapper {
+    background: linear-gradient(135deg, var(--secondary-color), #FFC966);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(255, 184, 77, 0.3);
+}
+
+.seo-card-warning .seo-icon-wrapper i {
+    color: white;
+    font-size: 2.5rem;
+}
+
+.seo-card-warning .seo-value {
+    color: var(--secondary-color);
+    font-weight: 700;
+    font-size: 2.5rem;
+}
+
+.seo-card-warning .seo-label {
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.seo-card-info {
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.05) 0%, rgba(107, 203, 119, 0.1) 100%);
+    border-left: 4px solid var(--accent-color);
+}
+
+.seo-card-info .seo-icon-wrapper {
+    background: linear-gradient(135deg, var(--accent-color), #6BCB77);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+}
+
+.seo-card-info .seo-icon-wrapper i {
+    color: white;
+    font-size: 2.5rem;
+}
+
+.seo-card-info .seo-value {
+    color: var(--accent-color);
+    font-weight: 700;
+    font-size: 2.5rem;
+}
+
+.seo-card-info .seo-label {
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* ضمان نفس الارتفاع للبطاقات */
+.row.align-items-stretch .col-md-3 {
+    display: flex;
+}
+
+.row.align-items-stretch .col-md-3 .card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.row.align-items-stretch .col-md-3 .card .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.row.align-items-stretch .col-md-3 .card .card-body .mt-auto {
+    margin-top: auto;
+}
+
+.seo-badge-primary {
+    background: linear-gradient(135deg, var(--primary-color), #5BA3F5) !important;
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.seo-status-badge {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 20px;
+}
+
+/* تحسين Core Web Vitals Cards */
+.vital-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: flex-start;
+}
+
+.vital-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+.vital-card-lcp {
+    border-top: 4px solid var(--primary-color);
+}
+
+.vital-card-lcp:hover {
+    border-top-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.05) 0%, #ffffff 100%);
+}
+
+.vital-card-fid {
+    border-top: 4px solid var(--secondary-color);
+}
+
+.vital-card-fid:hover {
+    border-top-color: var(--secondary-color);
+    background: linear-gradient(135deg, rgba(255, 184, 77, 0.05) 0%, #ffffff 100%);
+}
+
+.vital-card-cls {
+    border-top: 4px solid var(--success-color);
+}
+
+.vital-card-cls:hover {
+    border-top-color: var(--success-color);
+    background: linear-gradient(135deg, rgba(107, 203, 119, 0.05) 0%, #ffffff 100%);
+}
+
+.vital-icon-wrapper {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    transition: all 0.3s ease;
+}
+
+.vital-card-lcp .vital-icon-wrapper {
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(91, 163, 245, 0.2));
+}
+
+.vital-card-lcp .vital-icon-wrapper i {
+    color: var(--primary-color);
+}
+
+.vital-card-fid .vital-icon-wrapper {
+    background: linear-gradient(135deg, rgba(255, 184, 77, 0.1), rgba(255, 201, 102, 0.2));
+}
+
+.vital-card-fid .vital-icon-wrapper i {
+    color: var(--secondary-color);
+}
+
+.vital-card-cls .vital-icon-wrapper {
+    background: linear-gradient(135deg, rgba(107, 203, 119, 0.1), rgba(125, 216, 127, 0.2));
+}
+
+.vital-card-cls .vital-icon-wrapper i {
+    color: var(--success-color);
+}
+
+.vital-card:hover .vital-icon-wrapper {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* أزرار مشاركة على منصات التواصل الاجتماعي */
+.social-share-section {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 2px solid var(--border-color);
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.social-share-section h6 {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.social-share-btn {
+    border-radius: 25px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-width: 2px;
+}
+
+.social-share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.social-share-btn i {
+    font-size: 1.1rem;
+}
+
+.btn-outline-primary.social-share-btn:hover {
+    background: linear-gradient(135deg, var(--primary-color), #5BA3F5);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.btn-outline-success.social-share-btn:hover {
+    background: linear-gradient(135deg, var(--success-color), #7DD87F);
+    border-color: var(--success-color);
+    color: white;
+}
+
+.btn-outline-info.social-share-btn:hover {
+    background: linear-gradient(135deg, var(--accent-color), #6EDDD6);
+    border-color: var(--accent-color);
+    color: white;
+}
+
+.btn-outline-secondary.social-share-btn:hover {
+    background: linear-gradient(135deg, #6c757d, #868e96);
+    border-color: #6c757d;
+    color: white;
+}
+
+.btn-outline-dark.social-share-btn:hover {
+    background: linear-gradient(135deg, #343a40, #495057);
+    border-color: #343a40;
+    color: white;
+}
+
+/* ضمان عرض متساوٍ للفكرة والتعليقات */
+.view-idea-content .col-md-8 {
+    max-width: 100%;
+}
+
+.view-idea-content article.card,
+.view-idea-content section.card,
+.view-idea-content nav.card {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* تنسيق محتوى الفكرة - ضبط القوائم */
+.idea-content {
+    line-height: 1.8;
+    font-size: 1.05rem;
+    color: var(--text-color);
+    direction: rtl;
+    text-align: right;
+}
+
+.idea-content p {
+    margin-bottom: 1.25rem;
+    line-height: 1.8;
+    text-align: justify;
+    direction: rtl;
+}
+
+.idea-content ul,
+.idea-content ol {
+    margin-bottom: 1.5rem;
+    margin-top: 1rem;
+    padding-right: 2.5rem;
+    padding-left: 0;
+    list-style-position: outside;
+    direction: rtl;
+    text-align: right;
+    display: block;
+}
+
+.idea-content ul li,
+.idea-content ol li {
+    margin-bottom: 0.75rem;
+    line-height: 1.9;
+    padding-right: 0.5rem;
+    padding-left: 0;
+    text-align: right;
+    direction: rtl;
+    display: list-item;
+    list-style-position: outside;
+    text-indent: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.idea-content ul {
+    list-style-type: disc;
+}
+
+.idea-content ol {
+    list-style-type: decimal;
+}
+
+.idea-content ul ul,
+.idea-content ol ol,
+.idea-content ul ol,
+.idea-content ol ul {
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    padding-right: 2rem;
+    margin-right: 1rem;
+    list-style-position: outside;
+}
+
+.idea-content li::marker {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+.idea-content li {
+    text-align: right;
+    direction: rtl;
+    display: list-item;
+    list-style-position: outside;
+}
+
+/* ضمان أن النص في القوائم يبدأ من نفس النقطة */
+.idea-content ul li::before,
+.idea-content ol li::before {
+    content: '';
+    display: none;
+}
+
+.idea-content strong {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.idea-content h1,
+.idea-content h2,
+.idea-content h3,
+.idea-content h4,
+.idea-content h5,
+.idea-content h6 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+    font-weight: 700;
+    text-align: right;
+    direction: rtl;
+}
+
+.idea-content h1 {
+    font-size: 2rem;
+}
+
+.idea-content h2 {
+    font-size: 1.75rem;
+}
+
+.idea-content h3 {
+    font-size: 1.5rem;
+}
+
+.idea-content h4 {
+    font-size: 1.25rem;
+}
+
+.idea-content blockquote {
+    border-right: 4px solid var(--primary-color);
+    padding-right: 1rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 5px;
+    direction: rtl;
+    text-align: right;
+}
+
+.idea-content code {
+    background: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+    color: var(--primary-color);
+    direction: ltr;
+    text-align: left;
+}
+
+.idea-content pre {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+    direction: ltr;
+    text-align: left;
+}
+
+.idea-content pre code {
+    background: transparent;
+    padding: 0;
+}
+
+/* تحسين المسافات بين العناصر */
+.idea-content > *:first-child {
+    margin-top: 0;
+}
+
+.idea-content > *:last-child {
+    margin-bottom: 0;
+}
+
+/* إصلاح مشكلة القوائم - ضمان أن كل عنصر في سطر منفصل */
+.idea-content ul,
+.idea-content ol {
+    -webkit-padding-start: 0;
+    -moz-padding-start: 0;
+    padding-inline-start: 0;
+    padding-inline-end: 2.5rem;
+}
+
+.idea-content li {
+    margin-right: 0;
+    margin-left: 0;
+    padding-right: 0.5rem;
+    padding-left: 0;
+    display: list-item !important;
+    list-style-position: outside !important;
+    list-style-type: inherit;
+    clear: both;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 1.5em;
+    position: relative;
+    margin-bottom: 0.75rem;
+    line-height: 1.9;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    text-indent: 0;
+}
+
+/* ضمان أن كل عنصر في القائمة يبدأ من نفس النقطة */
+.idea-content ul li,
+.idea-content ol li {
+    text-align: right;
+    direction: rtl;
+}
+
+/* تحسين عرض القوائم على جميع المتصفحات */
+.idea-content ul,
+.idea-content ol {
+    -webkit-margin-before: 1rem;
+    -webkit-margin-after: 1.5rem;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    -webkit-padding-start: 0;
+    -webkit-padding-end: 2.5rem;
+    margin-block-start: 1rem;
+    margin-block-end: 1.5rem;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    padding-inline-start: 0;
+    padding-inline-end: 2.5rem;
+    list-style-position: outside !important;
+    display: block !important;
+}
+
+/* ضمان أن العلامات (markers) تظهر بشكل صحيح */
+.idea-content ul li::marker,
+.idea-content ol li::marker {
+    display: list-item;
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+/* تنسيق القوائم التي تم إنشاؤها بواسطة JavaScript أو Python */
+.idea-content-list {
+    margin-bottom: 1.5rem !important;
+    margin-top: 1rem !important;
+    padding-right: 2.5rem !important;
+    padding-left: 0 !important;
+    list-style-position: outside !important;
+    direction: rtl !important;
+    text-align: right !important;
+    display: block !important;
+    list-style-type: disc !important;
+}
+
+.idea-content-list li {
+    margin-bottom: 0.75rem !important;
+    line-height: 1.9 !important;
+    padding-right: 0.5rem !important;
+    padding-left: 0 !important;
+    text-align: right !important;
+    direction: rtl !important;
+    display: list-item !important;
+    list-style-position: outside !important;
+    list-style-type: disc !important;
+    clear: both !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    min-height: 1.5em !important;
+    position: relative !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    text-indent: 0 !important;
+}
+
+/* تنسيق الطباعة */
+@media print {
+    .navbar,
+    .breadcrumb,
+    .social-share-section,
+    .btn,
+    nav,
+    footer,
+    .alert {
+        display: none !important;
+    }
+    
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    
+    a {
+        color: black !important;
+        text-decoration: underline !important;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        color: black !important;
+        page-break-after: avoid;
+    }
+}
+
+/* بطاقات SEO بنفس تصميم Core Web Vitals */
+.seo-vital-card {
+    border-top: 4px solid;
+    height: 100%;
+}
+
+.seo-vital-primary {
+    border-top-color: var(--primary-color);
+}
+
+.seo-vital-primary:hover {
+    border-top-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.05) 0%, #ffffff 100%);
+}
+
+.seo-vital-primary .vital-icon-wrapper {
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(91, 163, 245, 0.2));
+}
+
+.seo-vital-primary .vital-icon-wrapper i {
+    color: var(--primary-color);
+}
+
+.seo-vital-primary .vital-value {
+    color: var(--primary-color);
+}
+
+.seo-vital-success {
+    border-top-color: var(--success-color);
+}
+
+.seo-vital-success:hover {
+    border-top-color: var(--success-color);
+    background: linear-gradient(135deg, rgba(107, 203, 119, 0.05) 0%, #ffffff 100%);
+}
+
+.seo-vital-success .vital-icon-wrapper {
+    background: linear-gradient(135deg, rgba(107, 203, 119, 0.1), rgba(125, 216, 127, 0.2));
+}
+
+.seo-vital-success .vital-icon-wrapper i {
+    color: var(--success-color);
+}
+
+.seo-vital-success .vital-value {
+    color: var(--success-color);
+}
+
+.seo-vital-warning {
+    border-top-color: var(--secondary-color);
+}
+
+.seo-vital-warning:hover {
+    border-top-color: var(--secondary-color);
+    background: linear-gradient(135deg, rgba(255, 184, 77, 0.05) 0%, #ffffff 100%);
+}
+
+.seo-vital-warning .vital-icon-wrapper {
+    background: linear-gradient(135deg, rgba(255, 184, 77, 0.1), rgba(255, 201, 102, 0.2));
+}
+
+.seo-vital-warning .vital-icon-wrapper i {
+    color: var(--secondary-color);
+}
+
+.seo-vital-warning .vital-value {
+    color: var(--secondary-color);
+}
+
+.seo-vital-info {
+    border-top-color: var(--accent-color);
+}
+
+.seo-vital-info:hover {
+    border-top-color: var(--accent-color);
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.05) 0%, #ffffff 100%);
+}
+
+.seo-vital-info .vital-icon-wrapper {
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(107, 203, 119, 0.2));
+}
+
+.seo-vital-info .vital-icon-wrapper i {
+    color: var(--accent-color);
+}
+
+.seo-vital-info .vital-value {
+    color: var(--accent-color);
+}
+
+.vital-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0;
+}
+
+.vital-name {
+    font-size: 1.1rem;
+    color: var(--text-color);
+    margin: 0;
+}
+
+.vital-status {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 20px;
+    margin-top: 0.5rem;
+}
+
+/* تحسين هيدر Core Web Vitals */
+.core-web-vitals-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #5BA3F5 50%, var(--accent-color) 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 15px 15px 0 0;
+}
+
+.core-web-vitals-header h5 {
+    color: white !important;
+    font-weight: 700;
+    font-size: 1.3rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin: 0;
+}
+
+.core-web-vitals-header i {
+    font-size: 1.5rem;
+    color: white;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* تحسين وضوح النصوص في Core Web Vitals */
+.vital-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: flex-start;
+}
+
+.vital-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.vital-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0.5rem 0;
+}
+
+.vital-card p.text-muted {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #6c757d;
+    margin: 0.25rem 0;
+}
+
+.vital-card small.text-muted {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #6c757d;
+    margin-top: 0.5rem;
 }
 

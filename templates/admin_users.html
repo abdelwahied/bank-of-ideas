@@ -14,27 +14,27 @@
 <!-- إحصائيات سريعة -->
 <div class="row mb-4">
     <div class="col-md-4 mb-3">
-        <div class="card text-center" style="background: linear-gradient(135deg, #4A90E2, #5BA3F5); color: white;">
+        <div class="card text-center card-gradient-primary">
             <div class="card-body">
-                <i class="bi bi-people-fill" style="font-size: 2rem;"></i>
+                <i class="bi bi-people-fill icon-medium"></i>
                 <h4 class="mt-2">{{ users_data|length }}</h4>
                 <p class="mb-0">إجمالي المستخدمين</p>
             </div>
         </div>
     </div>
     <div class="col-md-4 mb-3">
-        <div class="card text-center" style="background: linear-gradient(135deg, #FFB84D, #FFC966); color: white;">
+        <div class="card text-center card-gradient-warning">
             <div class="card-body">
-                <i class="bi bi-shield-check-fill" style="font-size: 2rem;"></i>
+                <i class="bi bi-shield-check-fill icon-medium"></i>
                 <h4 class="mt-2">{{ users_data|selectattr('user.is_admin', 'equalto', True)|list|length }}</h4>
                 <p class="mb-0">المدراء</p>
             </div>
         </div>
     </div>
     <div class="col-md-4 mb-3">
-        <div class="card text-center" style="background: linear-gradient(135deg, #4ECDC4, #6BCB77); color: white;">
+        <div class="card text-center card-gradient-success">
             <div class="card-body">
-                <i class="bi bi-person-fill" style="font-size: 2rem;"></i>
+                <i class="bi bi-person-fill icon-medium"></i>
                 <h4 class="mt-2">{{ users_data|selectattr('user.is_admin', 'equalto', False)|list|length }}</h4>
                 <p class="mb-0">المستخدمون العاديون</p>
             </div>
@@ -75,12 +75,15 @@
                         <td>
                             {% if user.profile_picture %}
                             <img src="{{ url_for('uploaded_file', filename=user.profile_picture) }}" 
-                                 alt="{{ user.username }}" 
-                                 class="rounded-circle" 
-                                 style="width: 40px; height: 40px; object-fit: cover;">
+                                 alt="صورة بروفايل {{ user.username }}" 
+                                 title="{{ user.username }}"
+                                 class="rounded-circle"
+                                 width="40"
+                                 height="40"
+                                 loading="lazy"
+                                 class="profile-picture-small">
                             {% else %}
-                            <div class="rounded-circle d-flex align-items-center justify-content-center" 
-                                 style="width: 40px; height: 40px; background: linear-gradient(135deg, #4A90E2, #5BA3F5); color: white; font-weight: bold;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center profile-picture-placeholder-small">
                                 {{ user.username[0].upper() }}
                             </div>
                             {% endif %}
