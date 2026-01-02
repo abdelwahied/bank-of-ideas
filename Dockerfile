@@ -28,5 +28,8 @@ EXPOSE 4000
 # --timeout 300: زيادة timeout للصفحات الثقيلة مثل Dashboard
 # --workers 4: عدد العمال (processes)
 # --bind 0.0.0.0:4000: الاستماع على جميع الـ interfaces
-CMD ["gunicorn", "--timeout", "300", "--workers", "4", "--bind", "0.0.0.0:4000", "app:app"]
+# --log-level debug: مستوى logging تفصيلي
+# --access-logfile -: طباعة access logs إلى stdout
+# --error-logfile -: طباعة error logs إلى stderr
+CMD ["gunicorn", "--timeout", "300", "--workers", "4", "--bind", "0.0.0.0:4000", "--log-level", "debug", "--access-logfile", "-", "--error-logfile", "-", "app:app"]
 

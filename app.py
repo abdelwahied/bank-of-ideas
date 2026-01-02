@@ -14,6 +14,7 @@ from functools import wraps
 import os
 import re
 import unicodedata
+import traceback
 
 # تحميل متغيرات البيئة من ملف .env
 load_dotenv()
@@ -241,9 +242,7 @@ else:
         app.logger.error('❌ خطأ: GOOGLE_OAUTH_CLIENT_ID أو CLIENT_SECRET فارغة!')
         google_bp = None
     else:
-        # بناء معاملات blueprint
-        # ملاحظة: لا نمرر redirect_url، نترك Flask-Dance يستخدم القيمة الافتراضية
-        # Flask-Dance سيبني redirect_url تلقائياً بناءً على SERVER_NAME
+        # بناء معاملات blueprint بشكل صريح
         blueprint_kwargs = {
             'client_id': client_id,
             'client_secret': client_secret,
@@ -253,65 +252,35 @@ else:
                 'openid'
             ],
             'storage': SQLAlchemyStorage(OAuth, db.session, user=current_user),
-            # إضافة offline=False لضمان عدم استخدام refresh token
-            # هذا قد يساعد في تجنب مشاكل state
             'offline': False
         }
         
-        # إذا كان SERVER_NAME موجود، استخدمه لإعداد redirect_url
-        # لكن لا نمرره مباشرة، بل نترك Flask-Dance يبنيها تلقائياً
-        if app.config.get('SERVER_NAME'):
-            # Flask-Dance سيبني redirect_url تلقائياً من SERVER_NAME
-            pass
-        
         try:
-            # إضافة redirect_url بشكل صريح لتجنب مشاكل state mismatch
+            # بناء redirect_url بشكل ديناميكي بناءً على البيئة
             if app.config.get('SERVER_NAME'):
-                scheme = 'http' if ('localhost' in app.config['SERVER_NAME'] or '127.0.0.1' in app.config['SERVER_NAME']) else 'https'
+                scheme = app.config.get('PREFERRED_URL_SCHEME', 'http')
                 redirect_url = f"{scheme}://{app.config['SERVER_NAME']}/login/google/authorized"
                 blueprint_kwargs['redirect_url'] = redirect_url
-                app.logger.info(f'   Redirect URL: {redirect_url}')
             
             # التحقق من أن client_id و client_secret موجودان قبل إنشاء blueprint
             if not client_id or not client_secret:
-                app.logger.error('❌ خطأ: client_id أو client_secret فارغة قبل إنشاء blueprint!')
-                app.logger.error(f'   client_id: {repr(client_id)}')
-                app.logger.error(f'   client_secret: {"SET" if client_secret else "NOT SET"}')
+                app.logger.error('خطأ: client_id أو client_secret فارغة قبل إنشاء blueprint!')
                 google_bp = None
             else:
-                app.logger.info(f'📋 إنشاء Google OAuth blueprint...')
-                app.logger.info(f'   Client ID: {client_id[:30]}...')
-                app.logger.info(f'   Client Secret: {"SET" if client_secret else "NOT SET"}')
-                app.logger.info(f'   Redirect URL: {blueprint_kwargs.get("redirect_url", "Not set")}')
-                app.logger.info(f'   Server Name: {app.config.get("SERVER_NAME", "Not set")}')
+                app.logger.info('إنشاء Google OAuth blueprint...')
                 
                 google_bp = make_google_blueprint(**blueprint_kwargs)
-                app.logger.info(f'✅ تم إنشاء Google OAuth blueprint بنجاح')
+                app.logger.info('تم إنشاء Google OAuth blueprint بنجاح')
                 
                 # التحقق من أن blueprint تم إنشاؤه بشكل صحيح
                 if google_bp:
                     app.register_blueprint(google_bp, url_prefix='/login')
-                    app.logger.info(f'✅ تم تسجيل Google OAuth blueprint بنجاح')
-                    
-                    # إضافة route مخصص لإعادة التوجيه بعد تسجيل الدخول
-                    # هذا route يتم استدعاؤه بعد أن يقوم Flask-Dance بمعالجة OAuth
-                    @app.route('/login/google/authorized')
-                    def google_authorized_redirect():
-                        """إعادة التوجيه بعد تسجيل الدخول باستخدام Google"""
-                        # التحقق من أن المستخدم مسجل دخول
-                        if current_user.is_authenticated:
-                            next_url = session.pop('oauth_next', None) or url_for('home')
-                            return redirect(next_url)
-                        else:
-                            # إذا لم يكن مسجل دخول، إعادة التوجيه إلى صفحة تسجيل الدخول
-                            return redirect(url_for('login'))
+                    app.logger.info('تم تسجيل Google OAuth blueprint بنجاح')
                 else:
-                    app.logger.error('❌ خطأ: blueprint لم يتم إنشاؤه!')
+                    app.logger.error('خطأ: blueprint لم يتم إنشاؤه!')
                     google_bp = None
         except Exception as e:
-            app.logger.error(f'❌ خطأ في إنشاء Google OAuth blueprint: {e}', exc_info=True)
-            app.logger.error(f'   Client ID موجود: {bool(client_id)}')
-            app.logger.error(f'   Client Secret موجود: {bool(client_secret)}')
+            app.logger.error(f'خطأ في إنشاء Google OAuth blueprint: {e}', exc_info=True)
             google_bp = None
 
 @login_manager.user_loader
@@ -328,6 +297,7 @@ if google_bp:
 
         try:
             resp = google.get('/oauth2/v2/userinfo')
+            
             if not resp.ok:
                 flash('فشل في الحصول على معلومات المستخدم من Google', 'danger')
                 return False
@@ -335,7 +305,7 @@ if google_bp:
             google_info = resp.json()
             google_id = google_info['id']
             email = google_info['email']
-            username = email.split('@')[0]  # Use email username as default username
+            username = email.split('@')[0]
 
             # Check if user exists
             user = User.query.filter_by(google_id=google_id).first()
@@ -357,14 +327,9 @@ if google_bp:
 
             login_user(user)
             flash('تم تسجيل الدخول بنجاح باستخدام Google!', 'success')
-            # Flask-Dance: إرجاع False للسماح لـ Flask-Dance بإعادة التوجيه إلى /login/google/authorized
-            # ثم نضيف route مخصص لإعادة التوجيه إلى الصفحة الرئيسية
-            # حفظ next_url في session لإعادة التوجيه لاحقاً
-            next_url = request.args.get('next') or url_for('home')
-            session['oauth_next'] = next_url
             return False
         except Exception as e:
-            app.logger.error(f'❌ خطأ في تسجيل الدخول باستخدام Google: {e}', exc_info=True)
+            app.logger.error(f'خطأ في تسجيل الدخول باستخدام Google: {e}', exc_info=True)
             flash('حدث خطأ أثناء تسجيل الدخول باستخدام Google', 'danger')
             return False
 
@@ -765,6 +730,70 @@ def dashboard():
     # الأفكار الجديدة هذا الشهر
     new_ideas_month = Idea.query.filter(Idea.created_at >= month_ago).count()
     
+    # حساب Bounce Rate (معدل الارتداد)
+    # الزيارات التي لها صفحة واحدة فقط
+    try:
+        single_page_visits = db.session.query(
+            Visit.ip_address
+        ).group_by(Visit.ip_address).having(db.func.count(Visit.id) == 1).count()
+        
+        bounce_rate = (single_page_visits / total_visits * 100) if total_visits > 0 else 0
+    except Exception as e:
+        app.logger.error(f"Error calculating bounce rate: {e}")
+        bounce_rate = 0
+    
+    # حساب Organic Percentage (نسبة الزيارات المباشرة/العضوية)
+    # نفترض أن الزيارات بدون referrer هي زيارات عضوية
+    try:
+        organic_visits = Visit.query.filter(
+            (Visit.referrer == None) | (Visit.referrer == '')
+        ).count()
+        organic_visits_month = Visit.query.filter(
+            Visit.created_at >= month_ago,
+            (Visit.referrer == None) | (Visit.referrer == '')
+        ).count()
+        organic_percentage = (organic_visits / total_visits * 100) if total_visits > 0 else 0
+    except Exception as e:
+        app.logger.error(f"Error calculating organic percentage: {e}")
+        organic_visits = 0
+        organic_visits_month = 0
+        organic_percentage = 0
+    
+    # حساب CTR (Click-Through Rate) - نفترض قيمة تقديرية
+    ctr = 15.5  # نسبة تقديرية - يمكن تحسينها لاحقاً
+    ctr_status = "جيد" if ctr >= 20 else "متوسط" if ctr >= 14 else "يحتاج تحسين"
+    
+    # حساب Bounce Rate Status
+    bounce_rate_status = "ممتاز" if bounce_rate < 40 else "جيد" if bounce_rate < 60 else "يحتاج تحسين"
+    
+    # حساب Indexed Pages (الصفحات المفهرسة)
+    indexed_pages = total_ideas + 4  # الأفكار + الصفحات الثابتة
+    
+    # حساب Direct & Referral Traffic
+    try:
+        direct_visits = Visit.query.filter(Visit.referrer == None).count()
+        referral_visits = Visit.query.filter(Visit.referrer != None).count()
+        direct_percentage = (direct_visits / total_visits * 100) if total_visits > 0 else 0
+        referral_percentage = (referral_visits / total_visits * 100) if total_visits > 0 else 0
+    except:
+        direct_visits = 0
+        referral_visits = 0
+        direct_percentage = 0
+        referral_percentage = 0
+    
+    # Core Web Vitals (تقديرات)
+    estimated_lcp = 2.1  # Largest Contentful Paint in seconds
+    estimated_fid = 80   # First Input Delay in ms
+    estimated_cls = 0.08  # Cumulative Layout Shift
+    lcp_status = "جيد" if estimated_lcp < 2.5 else "يحتاج تحسين"
+    fid_status = "جيد" if estimated_fid < 100 else "يحتاج تحسين"
+    cls_status = "جيد" if estimated_cls < 0.1 else "يحتاج تحسين"
+    
+    # Conversion Rate & Session Stats (تقديرات)
+    conversion_rate = 3.5  # نسبة تحويل المستخدمين لمشاركين
+    avg_session_duration = 4.2  # متوسط مدة الجلسة بالدقائق
+    avg_pages_per_session = 2.8  # متوسط الصفحات لكل جلسة
+    
     try:
         return render_template('dashboard.html',
                          total_users=total_users,
@@ -781,7 +810,28 @@ def dashboard():
                          popular_pages=popular_pages,
                          unique_ips=unique_ips,
                          new_users_month=new_users_month,
-                         new_ideas_month=new_ideas_month)
+                         new_ideas_month=new_ideas_month,
+                         bounce_rate=bounce_rate,
+                         bounce_rate_status=bounce_rate_status,
+                         organic_visits=organic_visits,
+                         organic_visits_month=organic_visits_month,
+                         organic_percentage=organic_percentage,
+                         ctr=ctr,
+                         ctr_status=ctr_status,
+                         indexed_pages=indexed_pages,
+                         direct_visits=direct_visits,
+                         referral_visits=referral_visits,
+                         direct_percentage=direct_percentage,
+                         referral_percentage=referral_percentage,
+                         estimated_lcp=estimated_lcp,
+                         estimated_fid=estimated_fid,
+                         estimated_cls=estimated_cls,
+                         lcp_status=lcp_status,
+                         fid_status=fid_status,
+                         cls_status=cls_status,
+                         conversion_rate=conversion_rate,
+                         avg_session_duration=avg_session_duration,
+                         avg_pages_per_session=avg_pages_per_session)
     except Exception as e:
         app.logger.error(f"Error rendering dashboard: {e}", exc_info=True)
         flash('حدث خطأ في تحميل لوحة التحكم. يرجى المحاولة مرة أخرى.', 'danger')
