@@ -63,6 +63,12 @@ server_name = os.environ.get('SERVER_NAME')
 if server_name:
     app.config['SERVER_NAME'] = server_name
 
+# إعداد OAuth للعمل خلف reverse proxy
+# إذا كان OAUTHLIB_INSECURE_TRANSPORT=1، سيسمح بـ HTTP (للتطوير فقط)
+# في الإنتاج، يجب أن يكون HTTPS ويعمل خلف Nginx الذي يمرر X-Forwarded-Proto
+if os.environ.get('OAUTHLIB_INSECURE_TRANSPORT') == '1':
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
