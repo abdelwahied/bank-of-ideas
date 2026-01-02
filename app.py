@@ -630,96 +630,9 @@ def dashboard():
     
     # المستخدمون الجدد هذا الشهر
     new_users_month = User.query.filter(User.created_at >= month_ago).count()
-    
+
     # الأفكار الجديدة هذا الشهر
     new_ideas_month = Idea.query.filter(Idea.created_at >= month_ago).count()
-    
-    # ========== إحصائيات SEO ==========
-    
-    # 1. الزيارات العضوية (من محركات البحث)
-    search_engines = ['google', 'bing', 'yahoo', 'yandex', 'duckduckgo', 'baidu']
-    organic_visits = Visit.query.filter(
-        db.or_(*[Visit.referrer.like(f'%{engine}%') for engine in search_engines])
-    ).count()
-    organic_visits_month = Visit.query.filter(
-        Visit.created_at >= month_ago,
-        db.or_(*[Visit.referrer.like(f'%{engine}%') for engine in search_engines])
-    ).count()
-    
-    # 2. عدد الصفحات المفهرسة
-    # الصفحات الثابتة: الرئيسية، الأكثر مشاهدة، الأحدث، الأكثر تعليقاً = 4
-    # + عدد الأفكار
-    indexed_pages = 4 + total_ideas
-    
-    # 3. Core Web Vitals (تقديرات - في الإنتاج يجب استخدام أدوات حقيقية)
-    # LCP (Largest Contentful Paint) - الهدف: < 2.5s
-    estimated_lcp = 1.8  # ثانية
-    lcp_status = "جيد" if estimated_lcp < 2.5 else "يحتاج تحسين"
-    
-    # FID (First Input Delay) - الهدف: < 100ms
-    estimated_fid = 45  # ميلي ثانية
-    fid_status = "جيد" if estimated_fid < 100 else "يحتاج تحسين"
-    
-    # CLS (Cumulative Layout Shift) - الهدف: < 0.1
-    estimated_cls = 0.05
-    cls_status = "جيد" if estimated_cls < 0.1 else "يحتاج تحسين"
-    
-    # 4. معدل النقر (CTR) - نسبة الزيارات العضوية من إجمالي الزيارات
-    ctr = (organic_visits / total_visits * 100) if total_visits > 0 else 0
-    ctr_target = 20  # الهدف: 20%
-    ctr_status = "ممتاز" if ctr >= ctr_target else "جيد" if ctr >= ctr_target * 0.7 else "يحتاج تحسين"
-    
-    # ========== مقترحات إضافية ==========
-    
-    # 5. معدل الارتداد (Bounce Rate) - الزوار الذين زاروا صفحة واحدة فقط
-    # نحسب نسبة الزوار الذين لديهم زيارة واحدة فقط
-    # استعلام محسّن لتجنب timeout
-    try:
-        # استخدام subquery محسّن
-        single_page_subquery = db.session.query(
-            Visit.ip_address
-        ).group_by(Visit.ip_address).having(
-            db.func.count(Visit.id) == 1
-        ).subquery()
-        single_page_visits = db.session.query(db.func.count()).select_from(single_page_subquery).scalar() or 0
-        bounce_rate = (single_page_visits / unique_ips * 100) if unique_ips > 0 else 0
-    except Exception as e:
-        # في حالة حدوث خطأ، استخدم قيمة افتراضية
-        app.logger.error(f"Error calculating bounce rate: {e}")
-        bounce_rate = 0
-        single_page_visits = 0
-    bounce_rate_status = "ممتاز" if bounce_rate < 40 else "جيد" if bounce_rate < 60 else "يحتاج تحسين"
-    
-    # 6. متوسط مدة الجلسة (تقدير بناءً على عدد الصفحات)
-    # نحسب متوسط عدد الصفحات لكل IP
-    avg_pages_per_session = (total_visits / unique_ips) if unique_ips > 0 else 0
-    avg_session_duration = avg_pages_per_session * 2  # تقدير: 2 دقيقة لكل صفحة
-    
-    # 7. الصفحات الأكثر شعبية من محركات البحث
-    organic_popular_pages = db.session.query(
-        Visit.page_path,
-        db.func.count(Visit.id).label('count')
-    ).filter(
-        db.or_(*[Visit.referrer.like(f'%{engine}%') for engine in search_engines])
-    ).group_by(Visit.page_path).order_by(db.func.count(Visit.id).desc()).limit(5).all()
-    
-    # 8. معدل التحويل (Conversion Rate) - نسبة الزوار الذين سجلوا أو أضافوا أفكار
-    # الزوار الذين أصبحوا مستخدمين
-    converted_visits = Visit.query.filter(Visit.user_id.isnot(None)).count()
-    conversion_rate = (converted_visits / total_visits * 100) if total_visits > 0 else 0
-    
-    # 9. نسبة الزيارات العضوية من إجمالي الزيارات
-    organic_percentage = (organic_visits / total_visits * 100) if total_visits > 0 else 0
-    
-    # 10. الزيارات المباشرة (Direct) - بدون referrer
-    direct_visits = Visit.query.filter(
-        db.or_(Visit.referrer.is_(None), Visit.referrer == '')
-    ).count()
-    direct_percentage = (direct_visits / total_visits * 100) if total_visits > 0 else 0
-    
-    # 11. الزيارات من روابط خارجية (Referral)
-    referral_visits = total_visits - organic_visits - direct_visits
-    referral_percentage = (referral_visits / total_visits * 100) if total_visits > 0 else 0
     
     try:
         return render_template('dashboard.html',
@@ -737,30 +650,7 @@ def dashboard():
                          popular_pages=popular_pages,
                          unique_ips=unique_ips,
                          new_users_month=new_users_month,
-                         new_ideas_month=new_ideas_month,
-                         # SEO Statistics
-                         organic_visits=organic_visits,
-                         organic_visits_month=organic_visits_month,
-                         indexed_pages=indexed_pages,
-                         estimated_lcp=estimated_lcp,
-                         lcp_status=lcp_status,
-                         estimated_fid=estimated_fid,
-                         fid_status=fid_status,
-                         estimated_cls=estimated_cls,
-                         cls_status=cls_status,
-                         ctr=ctr,
-                         ctr_status=ctr_status,
-                         bounce_rate=bounce_rate,
-                         bounce_rate_status=bounce_rate_status,
-                         avg_session_duration=avg_session_duration,
-                         organic_popular_pages=organic_popular_pages,
-                         conversion_rate=conversion_rate,
-                         organic_percentage=organic_percentage,
-                         direct_visits=direct_visits,
-                         direct_percentage=direct_percentage,
-                         referral_visits=referral_visits,
-                         referral_percentage=referral_percentage,
-                         avg_pages_per_session=avg_pages_per_session)
+                         new_ideas_month=new_ideas_month)
     except Exception as e:
         app.logger.error(f"Error rendering dashboard: {e}", exc_info=True)
         flash('حدث خطأ في تحميل لوحة التحكم. يرجى المحاولة مرة أخرى.', 'danger')
