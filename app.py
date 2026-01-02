@@ -44,8 +44,13 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
 # Google OAuth configuration
 app.config['GOOGLE_OAUTH_CLIENT_ID'] = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
 app.config['GOOGLE_OAUTH_CLIENT_SECRET'] = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET')
-# SERVER_NAME معطل للإنتاج - يسبب مشاكل مع الوصول من IP خارجي
-# app.config['SERVER_NAME'] = os.environ.get('SERVER_NAME', 'localhost:4000')
+
+# إعداد SERVER_NAME لـ OAuth redirect URI
+# في الإنتاج، استخدم domain أو IP مع المنفذ
+server_name = os.environ.get('SERVER_NAME')
+if server_name:
+    app.config['SERVER_NAME'] = server_name
+
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
