@@ -208,17 +208,34 @@ else:
         # إذا لم يكن موجود، استخدم القيمة الافتراضية
         redirect_url = None
     
-    google_bp = make_google_blueprint(
-        client_id=app.config['GOOGLE_OAUTH_CLIENT_ID'],
-        client_secret=app.config['GOOGLE_OAUTH_CLIENT_SECRET'],
-        scope=[
-            'https://www.googleapis.com/auth/userinfo.email',
-            'https://www.googleapis.com/auth/userinfo.profile',
-            'openid'
-        ],
-        redirect_url=redirect_url,
-        storage=SQLAlchemyStorage(OAuth, db.session, user=current_user)
-    )
+    # التأكد من أن القيم ليست None أو فارغة
+    client_id = app.config['GOOGLE_OAUTH_CLIENT_ID']
+    client_secret = app.config['GOOGLE_OAUTH_CLIENT_SECRET']
+    
+    if not client_id or not client_secret:
+        app.logger.error('❌ خطأ: GOOGLE_OAUTH_CLIENT_ID أو CLIENT_SECRET فارغة!')
+        google_bp = None
+    else:
+        # بناء معاملات blueprint
+        blueprint_kwargs = {
+            'client_id': client_id,
+            'client_secret': client_secret,
+            'scope': [
+                'https://www.googleapis.com/auth/userinfo.email',
+                'https://www.googleapis.com/auth/userinfo.profile',
+                'openid'
+            ],
+            'storage': SQLAlchemyStorage(OAuth, db.session, user=current_user)
+        }
+        
+        # إضافة redirect_url فقط إذا كان موجوداً
+        if redirect_url:
+            blueprint_kwargs['redirect_url'] = redirect_url
+        
+        google_bp = make_google_blueprint(**blueprint_kwargs)
+        app.logger.info(f'✅ تم إنشاء Google OAuth blueprint')
+        app.logger.info(f'   Client ID: {client_id[:20]}...')
+        app.logger.info(f'   Redirect URL: {redirect_url}')
     app.register_blueprint(google_bp, url_prefix='/login')
     app.logger.info(f'✅ تم تفعيل Google OAuth بنجاح. Redirect URL: {redirect_url}')
 
