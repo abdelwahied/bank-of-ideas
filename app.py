@@ -22,6 +22,18 @@ load_dotenv()
 # في الإنتاج يجب استخدام HTTPS فقط
 
 app = Flask(__name__)
+
+# إعداد ProxyFix للعمل خلف reverse proxy (Nginx)
+# هذا يضمن أن Flask يعرف أنه يعمل على HTTPS
+app.wsgi_app = ProxyFix(
+    app.wsgi_app,
+    x_for=1,
+    x_proto=1,
+    x_host=1,
+    x_port=1,
+    x_prefix=1
+)
+
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24).hex())
 
 # إعدادات قاعدة البيانات
