@@ -143,6 +143,10 @@ def get_device_type(user_agent):
     return 'Desktop'
 
 db = SQLAlchemy(app)
+
+# تهيئة Flask-Session (يجب أن يكون بعد db)
+Session(app)
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
