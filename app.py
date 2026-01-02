@@ -4,7 +4,6 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 import uuid
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from flask_session import Session
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_dance.contrib.google import make_google_blueprint, google
@@ -147,10 +146,6 @@ def get_device_type(user_agent):
     return 'Desktop'
 
 db = SQLAlchemy(app)
-
-# تهيئة Flask-Session (يجب أن يكون بعد db)
-Session(app)
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
