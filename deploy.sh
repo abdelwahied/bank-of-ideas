@@ -50,3 +50,4 @@ docker-compose logs --tail=50
 echo "✅ تم Deployment بنجاح!"
 echo "🌐 التطبيق يعمل على: http://localhost:4000"
 
+

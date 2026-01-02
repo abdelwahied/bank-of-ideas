@@ -63,6 +63,11 @@ server_name = os.environ.get('SERVER_NAME')
 if server_name:
     app.config['SERVER_NAME'] = server_name
 
+# إعداد URL scheme (http أو https)
+# في الإنتاج، استخدم https
+preferred_url_scheme = os.environ.get('PREFERRED_URL_SCHEME', 'http')
+app.config['PREFERRED_URL_SCHEME'] = preferred_url_scheme
+
 # إعداد OAuth للعمل خلف reverse proxy
 # إذا كان OAUTHLIB_INSECURE_TRANSPORT=1، سيسمح بـ HTTP (للتطوير فقط)
 # في الإنتاج، يجب أن يكون HTTPS ويعمل خلف Nginx الذي يمرر X-Forwarded-Proto
