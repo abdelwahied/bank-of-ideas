@@ -344,9 +344,7 @@ if google_bp:
 
             login_user(user)
             flash('تم تسجيل الدخول بنجاح باستخدام Google!', 'success')
-            # إرجاع True لإيقاف إعادة التوجيه التلقائية من Flask-Dance
-            # ثم إعادة التوجيه يدوياً إلى الصفحة الرئيسية
-            from flask import redirect, url_for
+            # إعادة التوجيه إلى الصفحة الرئيسية
             return redirect(url_for('home'))
         except Exception as e:
             app.logger.error(f'❌ خطأ في تسجيل الدخول باستخدام Google: {e}', exc_info=True)
