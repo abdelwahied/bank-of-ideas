@@ -186,59 +186,81 @@ class Visit(db.Model):
     user = db.relationship('User', backref=db.backref('visits', lazy=True))
 
 # Google OAuth blueprint
-google_bp = make_google_blueprint(
-    client_id=app.config['GOOGLE_OAUTH_CLIENT_ID'],
-    client_secret=app.config['GOOGLE_OAUTH_CLIENT_SECRET'],
-    scope=[
-        'https://www.googleapis.com/auth/userinfo.email',
-        'https://www.googleapis.com/auth/userinfo.profile',
-        'openid'
-    ],
-    storage=SQLAlchemyStorage(OAuth, db.session, user=current_user)
-)
-app.register_blueprint(google_bp, url_prefix='/login')
+# تحقق من أن القيم موجودة قبل إنشاء blueprint
+google_oauth_enabled = bool(app.config.get('GOOGLE_OAUTH_CLIENT_ID') and app.config.get('GOOGLE_OAUTH_CLIENT_SECRET'))
+
+if not google_oauth_enabled:
+    app.logger.warning('⚠️ تحذير: GOOGLE_OAUTH_CLIENT_ID أو GOOGLE_OAUTH_CLIENT_SECRET غير موجودة في البيئة!')
+    app.logger.warning(f'GOOGLE_OAUTH_CLIENT_ID: {app.config.get("GOOGLE_OAUTH_CLIENT_ID")}')
+    app.logger.warning(f'GOOGLE_OAUTH_CLIENT_SECRET: {"***" if app.config.get("GOOGLE_OAUTH_CLIENT_SECRET") else "None"}')
+    google_bp = None
+else:
+    # بناء redirect URL بشكل صحيح
+    if app.config.get('SERVER_NAME'):
+        # إذا كان SERVER_NAME موجود، استخدمه مع scheme
+        scheme = app.config.get('PREFERRED_URL_SCHEME', 'https')
+        redirect_url = f"{scheme}://{app.config['SERVER_NAME']}/login/google/authorized"
+    else:
+        # إذا لم يكن موجود، استخدم القيمة الافتراضية
+        redirect_url = None
+    
+    google_bp = make_google_blueprint(
+        client_id=app.config['GOOGLE_OAUTH_CLIENT_ID'],
+        client_secret=app.config['GOOGLE_OAUTH_CLIENT_SECRET'],
+        scope=[
+            'https://www.googleapis.com/auth/userinfo.email',
+            'https://www.googleapis.com/auth/userinfo.profile',
+            'openid'
+        ],
+        redirect_url=redirect_url,
+        storage=SQLAlchemyStorage(OAuth, db.session, user=current_user)
+    )
+    app.register_blueprint(google_bp, url_prefix='/login')
+    app.logger.info(f'✅ تم تفعيل Google OAuth بنجاح. Redirect URL: {redirect_url}')
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@oauth_authorized.connect_via(google_bp)
-def google_logged_in(blueprint, token):
-    if not token:
-        flash('فشل تسجيل الدخول باستخدام Google', 'danger')
+# تسجيل معالج OAuth فقط إذا كان blueprint موجود
+if google_bp:
+    @oauth_authorized.connect_via(google_bp)
+    def google_logged_in(blueprint, token):
+        if not token:
+            flash('فشل تسجيل الدخول باستخدام Google', 'danger')
+            return False
+
+        resp = google.get('/oauth2/v2/userinfo')
+        if not resp.ok:
+            flash('فشل في الحصول على معلومات المستخدم من Google', 'danger')
+            return False
+
+        google_info = resp.json()
+        google_id = google_info['id']
+        email = google_info['email']
+        username = email.split('@')[0]  # Use email username as default username
+
+        # Check if user exists
+        user = User.query.filter_by(google_id=google_id).first()
+        if not user:
+            # Check if email exists
+            user = User.query.filter_by(email=email).first()
+            if user:
+                # Update existing user with Google ID
+                user.google_id = google_id
+            else:
+                # Create new user
+                user = User(
+                    username=username,
+                    email=email,
+                    google_id=google_id
+                )
+                db.session.add(user)
+                db.session.commit()
+
+        login_user(user)
+        flash('تم تسجيل الدخول بنجاح باستخدام Google!', 'success')
         return False
-
-    resp = google.get('/oauth2/v2/userinfo')
-    if not resp.ok:
-        flash('فشل في الحصول على معلومات المستخدم من Google', 'danger')
-        return False
-
-    google_info = resp.json()
-    google_id = google_info['id']
-    email = google_info['email']
-    username = email.split('@')[0]  # Use email username as default username
-
-    # Check if user exists
-    user = User.query.filter_by(google_id=google_id).first()
-    if not user:
-        # Check if email exists
-        user = User.query.filter_by(email=email).first()
-        if user:
-            # Update existing user with Google ID
-            user.google_id = google_id
-        else:
-            # Create new user
-            user = User(
-                username=username,
-                email=email,
-                google_id=google_id
-            )
-            db.session.add(user)
-            db.session.commit()
-
-    login_user(user)
-    flash('تم تسجيل الدخول بنجاح باستخدام Google!', 'success')
-    return False
 
 # إضافة cache headers للـ static files
 @app.after_request
