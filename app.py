@@ -42,6 +42,9 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-i
 app.config['SESSION_COOKIE_SECURE'] = False  # للتطوير المحلي (HTTP)
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+# إعدادات إضافية لضمان عمل الجلسات بشكل صحيح
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
+app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 
 # إعدادات قاعدة البيانات
 # دعم SQLite للتطوير و PostgreSQL للإنتاج
