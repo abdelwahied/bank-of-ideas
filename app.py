@@ -69,6 +69,14 @@ app.config['GOOGLE_OAUTH_CLIENT_SECRET'] = os.environ.get('GOOGLE_OAUTH_CLIENT_S
 server_name = os.environ.get('SERVER_NAME')
 if server_name:
     app.config['SERVER_NAME'] = server_name
+    # إعداد SESSION_COOKIE_DOMAIN بناءً على SERVER_NAME
+    if 'localhost' in server_name or '127.0.0.1' in server_name:
+        # للمحلي، لا نحدد domain
+        app.config['SESSION_COOKIE_DOMAIN'] = None
+    else:
+        # للإنتاج، استخدم domain فقط (بدون port)
+        domain = server_name.split(':')[0]
+        app.config['SESSION_COOKIE_DOMAIN'] = domain
 
 # إعداد URL scheme (http أو https)
 # في الإنتاج، استخدم https
