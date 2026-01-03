@@ -15,7 +15,8 @@
                 <form method="POST">
                     <div class="mb-3">
                         <label for="username" class="form-label">اسم المستخدم</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+                        <input type="text" class="form-control" id="username" name="username" required pattern="[a-zA-Z0-9]+" title="يجب أن يحتوي اسم المستخدم على أحرف وأرقام إنجليزية فقط">
+                        <small class="form-text text-muted">يجب أن يحتوي على أحرف وأرقام إنجليزية فقط</small>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">البريد الإلكتروني</label>
