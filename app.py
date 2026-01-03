@@ -328,7 +328,7 @@ if google_bp:
             login_user(user)
             flash('تم تسجيل الدخول بنجاح باستخدام Google!', 'success')
             # إرجاع redirect بدلاً من False لتجنب redirect loop
-            return redirect(url_for('index'))
+            return redirect(url_for('home'))
         except Exception as e:
             app.logger.error(f'خطأ في تسجيل الدخول باستخدام Google: {e}', exc_info=True)
             flash('حدث خطأ أثناء تسجيل الدخول باستخدام Google', 'danger')
