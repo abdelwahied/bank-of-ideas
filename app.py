@@ -11,6 +11,7 @@ from flask_dance.consumer import oauth_authorized
 from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
 from dotenv import load_dotenv
 from functools import wraps
+from PIL import Image
 import os
 import re
 import unicodedata
@@ -106,6 +107,34 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def compress_image(image_path, max_size=(800, 800), quality=85):
+    """
+    ضغط الصورة وتحسين الأداء
+    :param image_path: مسار الصورة
+    :param max_size: الحجم الأقصى (عرض، ارتفاع)
+    :param quality: جودة الصورة (1-100)
+    """
+    try:
+        with Image.open(image_path) as img:
+            # تحويل RGBA إلى RGB إذا كانت PNG بها شفافية
+            if img.mode in ('RGBA', 'LA', 'P'):
+                background = Image.new('RGB', img.size, (255, 255, 255))
+                if img.mode == 'P':
+                    img = img.convert('RGBA')
+                background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+                img = background
+            
+            # تصغير الصورة إذا كانت أكبر من max_size
+            img.thumbnail(max_size, Image.Resampling.LANCZOS)
+            
+            # حفظ الصورة المضغوطة
+            img.save(image_path, 'JPEG', quality=quality, optimize=True)
+            
+        return True
+    except Exception as e:
+        print(f"خطأ في ضغط الصورة: {e}")
+        return False
 
 def get_browser_name(user_agent):
     """تحديد اسم المتصفح من User-Agent"""
@@ -885,7 +914,12 @@ def edit_profile():
                 unique_filename = f"{uuid.uuid4()}_{filename}"
                 upload_path = os.path.join(app.config['UPLOAD_FOLDER'])
                 os.makedirs(upload_path, exist_ok=True)
-                file.save(os.path.join(upload_path, unique_filename))
+                file_path = os.path.join(upload_path, unique_filename)
+                file.save(file_path)
+                
+                # ضغط الصورة لتحسين الأداء
+                compress_image(file_path, max_size=(800, 800), quality=85)
+                
                 user.profile_picture = unique_filename
         
         db.session.commit()
@@ -1091,9 +1125,32 @@ def delete_user(user_id):
     flash(f'تم حذف المستخدم {username} بنجاح!', 'success')
     return redirect(url_for('admin_users'))
 
+@app.after_request
+def add_cache_control_headers(response):
+    """إضافة Cache-Control headers للموارد الثابتة"""
+    if 'text/css' in response.content_type:
+        response.cache_control.max_age = 31536000  # سنة واحدة
+        response.cache_control.public = True
+    elif 'javascript' in response.content_type:
+        response.cache_control.max_age = 31536000  # سنة واحدة
+        response.cache_control.public = True
+    elif 'font' in response.content_type:
+        response.cache_control.max_age = 31536000  # سنة واحدة
+        response.cache_control.public = True
+    
+    return response
+
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    """خدمة الملفات المرفوعة مع Cache-Control headers محسّنة"""
+    response = send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    
+    # إضافة Cache-Control headers للصور
+    if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg')):
+        response.cache_control.max_age = 31536000  # سنة واحدة
+        response.cache_control.public = True
+    
+    return response
 
 @app.route('/sitemap.xml')
 def sitemap():
