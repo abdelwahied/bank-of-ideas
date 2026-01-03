@@ -84,10 +84,12 @@
                         انضم في {{ user.created_at.strftime('%Y-%m-%d') }}
                     </p>
                 </div>
-                
+
+                {% if current_user.is_authenticated and current_user.id == user.id %}
                 <a href="{{ url_for('edit_profile') }}" class="btn btn-primary mt-3">
                     <i class="bi bi-pencil-fill ms-2"></i>تعديل البروفايل
                 </a>
+                {% endif %}
             </div>
         </div>
         
