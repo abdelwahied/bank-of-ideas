@@ -590,7 +590,21 @@ def view_idea(idea_id, slug=None):
         # الآخرون يرون فقط المنشورة
         comments = [c for c in all_comments if c.is_published]
     
-    return render_template('view_idea.html', idea=idea, comments=comments)
+    # جلب الأفكار ذات الصلة (نفس التصنيف، باستثناء الفكرة الحالية)
+    related_ideas = Idea.query.filter(
+        Idea.category == idea.category,
+        Idea.id != idea.id
+    ).order_by(Idea.views.desc()).limit(4).all()
+    
+    # إذا لم توجد أفكار في نفس التصنيف، اعرض الأفكار الأكثر مشاهدة
+    if len(related_ideas) < 4:
+        additional_ideas = Idea.query.filter(
+            Idea.id != idea.id,
+            ~Idea.id.in_([r.id for r in related_ideas])
+        ).order_by(Idea.views.desc()).limit(4 - len(related_ideas)).all()
+        related_ideas = list(related_ideas) + list(additional_ideas)
+    
+    return render_template('view_idea.html', idea=idea, comments=comments, related_ideas=related_ideas)
 
 @app.route('/idea/<int:idea_id>/comment', methods=['POST'])
 @login_required
