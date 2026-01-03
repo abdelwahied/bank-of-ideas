@@ -293,14 +293,14 @@ if google_bp:
     def google_logged_in(blueprint, token):
         if not token:
             flash('فشل تسجيل الدخول باستخدام Google', 'danger')
-            return False
+            return redirect(url_for('login'))
 
         try:
             resp = google.get('/oauth2/v2/userinfo')
             
             if not resp.ok:
                 flash('فشل في الحصول على معلومات المستخدم من Google', 'danger')
-                return False
+                return redirect(url_for('login'))
 
             google_info = resp.json()
             google_id = google_info['id']
@@ -327,11 +327,12 @@ if google_bp:
 
             login_user(user)
             flash('تم تسجيل الدخول بنجاح باستخدام Google!', 'success')
-            return False
+            # إرجاع redirect بدلاً من False لتجنب redirect loop
+            return redirect(url_for('index'))
         except Exception as e:
             app.logger.error(f'خطأ في تسجيل الدخول باستخدام Google: {e}', exc_info=True)
             flash('حدث خطأ أثناء تسجيل الدخول باستخدام Google', 'danger')
-            return False
+            return redirect(url_for('login'))
 
 # ملاحظة: تم إزالة @app.errorhandler(Exception) لأنه كان يسبب حلقة إعادة توجيه
 # الأخطاء يتم معالجتها في الـ routes نفسها
